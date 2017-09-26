@@ -1,7 +1,7 @@
 import discord
 from discord.ext.commands import Bot
 from discord.ext import commands
-import time
+from time import strftime, gmtime
 
 from utils.bot_logger import BotLogger
 from utils.bot_config import BotConfig
@@ -11,22 +11,18 @@ def main():
     BotLogger().debug("Starting script ...")
     config = BotConfig()
 
-    print(config.get("Defaults", "BotPrefix"))
+    token = config.get("Keys", "Token")
 
-    time.sleep(3)
+    client = discord.Client()
 
-    BotLogger().debug("test")
-
-
-    # client = discord.Client()
-
-    # @client.event
-    # async def on_ready():
-    #     logger.info("Bot Online!")
-    #     logger.info("Name: {}".format(client.user.name))
-    #     logger.info("ID: {}".format(client.user.id))
-    #     logger.info("Time: {}".format(strftime("%a, %d %b %Y %H:%M:%S GMT", gmtime())))
-    #     logger.info("----------")
+    @client.event
+    async def on_ready():
+        BotLogger().info("Bot Online!")
+        BotLogger().info("Name: {}".format(client.user.name))
+        BotLogger().info("ID: {}".format(client.user.id))
+        BotLogger().info("Time: {}".format(
+                         strftime("%a, %d %b %Y %H:%M:%S GMT", gmtime())))
+        BotLogger().info("----------")
 
 
 # # todo: put this in config
@@ -92,7 +88,7 @@ def main():
 #     #     print("Channel: {}".format(msg.channel))
 #     #     await client.send_message(msg.channel, "asd", embed=embed)
 
-    # client.run(bot_key)
+    client.run(token)
 
 #     print("----------")
 
