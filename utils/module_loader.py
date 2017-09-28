@@ -4,7 +4,6 @@ from utils.bot_logger import BotLogger
 from modules.ping.ping import PingModule
 
 
-
 class ModuleLoader:
     class __ModuleLoader():
         def __init__(self):
