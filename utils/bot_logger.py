@@ -1,5 +1,5 @@
 import logging
-from time import gmtime, strftime
+from time import localtime, strftime
 
 
 class BotLogger:
@@ -7,7 +7,7 @@ class BotLogger:
         def __init__(self):
             logging.basicConfig()
             self.__logger = logging.getLogger("BotLogger")
-            currtime = strftime("%Y%m%d-%H%M%S", gmtime())
+            currtime = strftime("%Y%m%d-%H%M%S", localtime())
             hdlr = logging.FileHandler('./logs/bot_{}.log'.format(currtime))
             fmtr = logging.Formatter('%(asctime)s %(levelname)s:%(message)s')
             hdlr.setFormatter(fmtr)
@@ -23,9 +23,7 @@ class BotLogger:
     def __init__(self):
         if not BotLogger.instance:
             BotLogger.instance = BotLogger.__BotLogger()
-            self.__logger = BotLogger.instance.get_logger()
-        else:
-            self.__logger = BotLogger.instance.get_logger()
+        self.__logger = BotLogger.instance.get_logger()
 
     def set_level(self, lvl):
         self.__logger.setLevel(lvl)
