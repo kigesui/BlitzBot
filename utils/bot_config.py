@@ -17,3 +17,6 @@ class BotConfig(object):
 
     def get(self, *args):
         return BotConfig.instance.get(*args)
+
+    def get_hex(self, *args):
+        return int(BotConfig.instance.get(*args), 16)

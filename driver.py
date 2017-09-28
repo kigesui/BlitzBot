@@ -1,6 +1,6 @@
 import discord
-from discord.ext.commands import Bot
-from discord.ext import commands
+# from discord.ext.commands import Bot
+# from discord.ext import commands
 from time import strftime, localtime
 
 from utils.bot_logger import BotLogger
@@ -11,11 +11,10 @@ from utils.module_loader import ModuleLoader
 def main():
     BotLogger().debug("Starting script ...")
 
-    # config = BotConfig()
-
     client = discord.Client()
+    modules = ModuleLoader().load_modules()
 
-    # redefining some function
+    # Redefining when bot starts
     @client.event
     async def on_ready():
         BotLogger().info("Bot Online!")
@@ -25,33 +24,36 @@ def main():
                          strftime("%a, %d %b %Y %H:%M:%S GMT", localtime())))
         BotLogger().info("----------")
 
-    # modules = ModuleLoader().load_modules()
-
+    # Redefining when bot receive message
     @client.event
-    async def on_message(msg):
+    async def on_message(request):
         # ignore non-prefix
         prefix = BotConfig().get("Defaults", "BotPrefix")
-        if not msg.content.startswith(prefix):
+        if not request.content.startswith(prefix):
             return
 
-        BotLogger().info("Author: {}".format(msg.author))
-        BotLogger().info("Server: {}".format(msg.server))
-        BotLogger().info("Channel: {}".format(msg.channel))
-        BotLogger().info("Content: {}".format(msg.content))
+        BotLogger().info("Author: {}".format(request.author))
+        BotLogger().info("Server: {}".format(request.server))
+        BotLogger().info("Channel: {}".format(request.channel))
+        BotLogger().info("Content: {}".format(request.content))
 
         is_success = False
         for module in modules:
-            is_success = module.execute(msg.content)
+            embed = module.execute(request.content, client)
 
-            if is_success:
-                break
+            if embed:
+                is_success = True
+                await client.send_message(request.channel, embed=embed)
+                BotLogger().info(
+                    "Command Executed: {}".format(request.content))
 
         if is_success is False:
+            response = "Invalid Command: {}".format(request.content)
             embed = discord.Embed()
-            embed.colour = BotConfig().get("Colors", "OnError")
-            embed.description = "Invalid Command: {}".format(msg.content)
-            await client.send_message(msg.channel, embed=embed)
-            BotLogger().error("Invalid Command")
+            embed.colour = BotConfig().get_hex("Colors", "OnError")
+            embed.description = response
+            await client.send_message(request.channel, embed=embed)
+            BotLogger().error(response)
 
         BotLogger().info("----------")
 
