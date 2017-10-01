@@ -78,11 +78,11 @@ def main():
                     "Command Executed Success: {}".format(request.content))
 
             elif exec_resp.code == 300:
-                BotLogger().warn("Permission Error")
+                BotLogger().warning("Permission Error")
                 is_success = True
                 await client.send_message(
                     request.channel, embed=exec_resp.embed)
-                BotLogger().warn(
+                BotLogger().warning(
                     "Command Executed Warning: {}".format(request.content))
 
             elif exec_resp.code == 500:

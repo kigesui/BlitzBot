@@ -38,7 +38,7 @@ class HallsModule(IModule):
             # create embed
             embed = Embed()
             embed.colour = BotConfig().get_hex("Colors", "OnSuccess")
-            embed.title = ":poop: Hall of poop :poop:"
+            embed.title = ":poop: Hall of Poop :poop:"
             # add each person poop
             sorted_poop = [(k, self.__hall_poop[k])
                            for k in sorted(
@@ -92,7 +92,7 @@ class HallsModule(IModule):
             # create response
             embed = Embed()
             embed.colour = BotConfig().get_hex("Colors", "OnSuccess")
-            embed.description = "{} has thrown {} :poop: at {}.".format(
+            embed.description = "{} throw {} :poop: at {}.".format(
                                 src_usr.mention, amount, tgt_usr.mention)
             return ExecResp(code=200, embed=embed)
 
