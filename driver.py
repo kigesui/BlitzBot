@@ -6,15 +6,18 @@ from time import strftime, localtime
 from modules.i_module import ExecArgs
 from utils.bot_logger import BotLogger
 from utils.bot_config import BotConfig
+from utils.bot_db import BotDB
 from utils.module_loader import ModuleLoader
 
 
 def main():
-    BotLogger().debug("Starting script ...")
+    BotLogger().info("Starting script ...")
     # BotLogger().debug("Owners: {}".format(BotConfig().get_owners()))
     # return
 
     client = discord.Client()
+
+    BotLogger().info("Loading Modules")
     modules = ModuleLoader().load_modules()
 
     # Redefining when bot starts
@@ -31,7 +34,7 @@ def main():
     @client.event
     async def on_message(request):
         # ignore non-prefix
-        prefix = BotConfig().get("Defaults", "BotPrefix")
+        prefix = BotConfig().get_botprefix()
         if not request.content.startswith(prefix):
             return
 
@@ -49,9 +52,15 @@ def main():
             # main execute function
             exec_resp = module.execute(command, exec_args)
 
-            if exec_resp.code == 500:
-                # command not from module
-                continue
+            if exec_resp.code == 6:
+                # shut down
+                BotLogger().info("Shutting down the bot")
+                is_success = True
+                await client.send_message(
+                    request.channel, embed=exec_resp.embed)
+                await client.logout()
+                await client.close()
+                BotLogger().info("Bot is closed.")
 
             elif exec_resp.code == 200:
                 is_success = True
@@ -60,23 +69,33 @@ def main():
                 BotLogger().info(
                     "Command Executed Success: {}".format(request.content))
 
+            elif exec_resp.code == 201:
+                is_success = True
+                for e in exec_resp.embed:
+                    await client.send_message(
+                        request.channel, embed=e)
+                BotLogger().info(
+                    "Command Executed Success: {}".format(request.content))
+
             elif exec_resp.code == 300:
+                BotLogger().warn("Permission Error")
                 is_success = True
                 await client.send_message(
                     request.channel, embed=exec_resp.embed)
-                BotLogger().info(
+                BotLogger().warn(
                     "Command Executed Warning: {}".format(request.content))
 
-            elif exec_resp.code == 6:
-                # shut down
-                BotLogger().info("Shutting down the bot")
+            elif exec_resp.code == 500:
+                # command not found from module
+                continue
+
+            elif exec_resp.code == 501:
+                BotLogger().error("Parsing Error")
                 is_success = True
                 await client.send_message(
                     request.channel, embed=exec_resp.embed)
-                await client.logout()
-                await client.close()
-                BotLogger().info(
-                    "Command Executed: {}".format(request.content))
+                BotLogger().error(
+                    "Command Parsing Error: {}".format(request.content))
 
             else:
                 BotLogger().critical(
@@ -94,6 +113,7 @@ def main():
         BotLogger().info("----------")
 
     # run the program
+    BotLogger().info("Running Client")
     client.run(BotConfig().get("Keys", "Token"))
 
 

@@ -4,9 +4,19 @@
 # LOG='blitz_'$NOW'.log'
 # ERRLOG='error_'$NOW'.log'
 
-# LOG_FOLDER='./logs'
+# check log folder
+LOG_DIR='./logs'
+if [ ! -d "$LOG_DIR" ]; then
+  echo "creating directory for logs ..."
+  mkdir $LOG_DIR
+fi
 
-# python3 driver.py 2> $LOG_FOLDER/$ERRLOG 1> $LOG_FOLDER/$LOG
-# python3 driver.py > $LOG_FOLDER/$LOG 2>&1
+# check db folder
+SQLITE_DIR='./data'
+if [ ! -d "$SQLITE_DIR" ]; then
+  echo "creating directory for directory ..."
+  mkdir $SQLITE_DIR
+fi
+
+
 python3 driver.py
-

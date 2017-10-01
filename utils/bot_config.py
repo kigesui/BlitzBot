@@ -21,6 +21,9 @@ class BotConfig(object):
     def get_hex(self, *args):
         return int(BotConfig.instance.get(*args), 16)
 
+    def get_botprefix(self):
+        return BotConfig.instance.get("Defaults", "BotPrefix")
+
     def get_owners(self):
         owners_ids = BotConfig.instance.get("Defaults", "BotOwners")
         return owners_ids.split(',')

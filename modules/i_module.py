@@ -18,9 +18,11 @@ class ExecResp(namedtuple('ExecResp', [ "code", "embed"])):
         # code
         # -1 = not set
         # 6 = shutdown
-        # 200 = success
+        # 200 = success, one embed
+        # 201 = success, list of embed
         # 300 = warning permission error, not owner
         # 500 = error, command does not belong to module
+        # 501 = error, command can't be parsed
         return super(ExecResp, cls).__new__(cls, code, embed)
 
 
