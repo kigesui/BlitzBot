@@ -2,6 +2,7 @@ from ..i_module import IModule, ExecResp
 from utils.bot_logger import BotLogger
 from utils.bot_config import BotConfig
 from utils.bot_db import BotDB
+from utils.utils import get_servername
 
 from discord import Embed
 
@@ -59,18 +60,11 @@ class HallsModule(IModule):
                            key=self.__hall_poop.get,
                            reverse=True)]
 
-            server = exec_args.rqt_msg.server
             rank = 0
             for user_id, user_poop in sorted_poop:
                 rank += 1
                 # get username
-                username = "{}".format(user_id)
-                if server:
-                    member = server.get_member(user_id)
-                    if member:
-                        username = member.name
-                        if member.nick:
-                            username = member.nick
+                username = get_servername(exec_args.rqt_msg.server, user_id)
                 # add to leaderboard
                 embed.add_field(name="#{} {}".format(rank, username),
                                 value="{} {}".format(user_poop,
@@ -84,25 +78,35 @@ class HallsModule(IModule):
         # """
         elif cmd_args[0] == "$":
             # check args
-            if len(cmd_args) != 1:
+            if not (len(cmd_args) == 1 or
+                    (len(cmd_args) == 2 and
+                     len(exec_args.rqt_msg.mentions) == 1)):
                 embed = Embed()
                 embed.colour = BotConfig().get_hex("Colors", "OnError")
                 prefix = BotConfig().get_botprefix()
-                embed.description = "Usage: {}$".format(prefix)
+                embed.description = "Usage: {}$ or {}$ @someone".format(
+                                    prefix, prefix)
                 return ExecResp(code=501, embed=embed)
 
             # refresh table
             self.__load_tables()
 
             # get user with amount
-            src_usr = exec_args.rqt_msg.author
-            amount = self.__hall_poop[src_usr.id]
+            if exec_args.rqt_msg.mentions:
+                tgt_usr = exec_args.rqt_msg.mentions[0]
+            else:
+                tgt_usr = exec_args.rqt_msg.author
+
+            if tgt_usr.id in self.__hall_poop:
+                amount = self.__hall_poop[tgt_usr.id]
+            else:
+                amount = 0
 
             # create embed
             embed = Embed()
             embed.colour = BotConfig().get_hex("Colors", "OnSuccess")
-            embed.description = "{} has {} {}".format(
-                                src_usr, amount, self.__poop_emoji)
+            embed.description = "{} holds {} {}".format(
+                                tgt_usr.mention, amount, self.__poop_emoji)
             return ExecResp(code=200, embed=embed)
 
         # """
