@@ -1,5 +1,5 @@
 from ..i_module import IModule, ExecResp
-# from utils.bot_logger import BotLogger
+from utils.bot_logger import BotLogger
 from utils.bot_config import BotConfig
 from utils.bot_db import BotDB
 
@@ -10,6 +10,7 @@ class HallsModule(IModule):
 
     def __init__(self):
         self.__load_tables()
+        self.__poop_emoji = '\U0001F4A9'
         return
 
     def __save_tables(self):
@@ -20,8 +21,19 @@ class HallsModule(IModule):
         self.__hall_poop = BotDB().get('hallPoop')
         return
 
+    def __get_emoji_poop(self, client):
+        for emoji in client.get_all_emojis():
+            BotLogger().debug("name:{}".format(emoji.name))
+            BotLogger().debug("id:{}".format(emoji.id))
+            BotLogger().debug("require_colons:{}".format(emoji.require_colons))
+            BotLogger().debug("url:{}".format(emoji.url))
+
     def execute(self, cmd, exec_args):
         cmd_args = cmd.split(' ')
+
+        # """
+        # show poop leader board
+        # """
         if cmd_args[0] == "lbp" or cmd_args[0] == "leaderboardpoop":
             # check args
             if len(cmd_args) != 1:
@@ -38,7 +50,8 @@ class HallsModule(IModule):
             # create embed
             embed = Embed()
             embed.colour = BotConfig().get_hex("Colors", "OnSuccess")
-            embed.title = ":poop: Hall of Poop :poop:"
+            embed.title = "{} Hall of Poop {}".format(self.__poop_emoji,
+                                                      self.__poop_emoji)
             # add each person poop
             sorted_poop = [(k, self.__hall_poop[k])
                            for k in sorted(
@@ -60,11 +73,41 @@ class HallsModule(IModule):
                             username = member.nick
                 # add to leaderboard
                 embed.add_field(name="#{} {}".format(rank, username),
-                                value="{} :poop:".format(user_poop),
+                                value="{} {}".format(user_poop,
+                                                     self.__poop_emoji),
                                 inline=True)
             # return
             return ExecResp(code=200, embed=embed)
 
+        # """
+        # show self amount
+        # """
+        elif cmd_args[0] == "$":
+            # check args
+            if len(cmd_args) != 1:
+                embed = Embed()
+                embed.colour = BotConfig().get_hex("Colors", "OnError")
+                prefix = BotConfig().get_botprefix()
+                embed.description = "Usage: {}$".format(prefix)
+                return ExecResp(code=501, embed=embed)
+
+            # refresh table
+            self.__load_tables()
+
+            # get user with amount
+            src_usr = exec_args.rqt_msg.author
+            amount = self.__hall_poop[src_usr.id]
+
+            # create embed
+            embed = Embed()
+            embed.colour = BotConfig().get_hex("Colors", "OnSuccess")
+            embed.description = "{} has {} {}".format(
+                                src_usr, amount, self.__poop_emoji)
+            return ExecResp(code=200, embed=embed)
+
+        # """
+        # throw poop
+        # """
         elif cmd_args[0] == "throwpoop":
             ''' throw stuff at someone '''
             # BotLogger().debug(cmd_args)
@@ -92,8 +135,9 @@ class HallsModule(IModule):
             # create response
             embed = Embed()
             embed.colour = BotConfig().get_hex("Colors", "OnSuccess")
-            embed.description = "{} throw {} :poop: at {}.".format(
-                                src_usr.mention, amount, tgt_usr.mention)
+            embed.description = "{} throw {} {} at {}.".format(
+                                src_usr, amount, self.__poop_emoji,
+                                tgt_usr.mention)
             return ExecResp(code=200, embed=embed)
 
         return ExecResp(code=500)
