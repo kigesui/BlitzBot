@@ -136,11 +136,13 @@ class HallsModule(IModule):
                 self.__hall_poop[tgt_usr.id] = int(amount)
             self.__save_tables()
 
+            src_usr_nick = get_servername(exec_args.rqt_msg.server, src_usr.id)
+
             # create response
             embed = Embed()
             embed.colour = BotConfig().get_hex("Colors", "OnSuccess")
-            embed.description = "{} throw {} {} at {}.".format(
-                                src_usr, amount, self.__poop_emoji,
+            embed.description = "**{}** throw {} {} at {}.".format(
+                                src_usr_nick, amount, self.__poop_emoji,
                                 tgt_usr.mention)
             return ExecResp(code=200, embed=embed)
 
