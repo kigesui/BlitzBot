@@ -16,6 +16,7 @@ def main():
     # return
 
     client = discord.Client()
+    playing_status = 'test'
 
     BotLogger().info("Loading Modules")
     modules = ModuleLoader().load_modules()
@@ -29,6 +30,7 @@ def main():
         BotLogger().info("Time: {}".format(
                          strftime("%a, %d %b %Y %H:%M:%S GMT", localtime())))
         BotLogger().info("----------")
+        await client.change_presence(game=discord.Game(name=playing_status))
 
     # Redefining when bot receive message
     @client.event
