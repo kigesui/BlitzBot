@@ -3,6 +3,7 @@
 # modules import
 from modules.ping.ping import PingModule
 from modules.halls.halls import HallsModule
+from modules.people.people import PeopleModule
 
 
 class ModuleLoader:
@@ -20,6 +21,7 @@ class ModuleLoader:
             cmd_modules = []
             cmd_modules.append(PingModule())
             cmd_modules.append(HallsModule())
+            cmd_modules.append(PeopleModule())
             return cmd_modules
 
     instance = None
