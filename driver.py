@@ -11,35 +11,60 @@ from utils.module_loader import ModuleLoader
 
 
 def main():
-    BotLogger().info("Starting script ...")
+    BotLogger().info("Starting Bot ...")
+
+    # init some global values
+    BOT_PREFIX = BotConfig().get_botprefix()
+
+    BotLogger().info("Bot Prefix: {}".format(BOT_PREFIX))
     # BotLogger().debug("Owners: {}".format(BotConfig().get_owners()))
-    # return
 
     client = discord.Client()
     playing_status = 'test'
 
     BotLogger().info("Loading Modules")
-    modules = ModuleLoader().load_modules()
+    cmd_modules, auto_modules = ModuleLoader().load_all_modules()
 
     # Redefining when bot starts
     @client.event
     async def on_ready():
+        BotLogger().info("----------")
         BotLogger().info("Bot Online!")
         BotLogger().info("Name: {}".format(client.user.name))
         BotLogger().info("ID: {}".format(client.user.id))
         BotLogger().info("Time: {}".format(
                          strftime("%a, %d %b %Y %H:%M:%S GMT", localtime())))
-        BotLogger().info("----------")
         await client.change_presence(game=discord.Game(name=playing_status))
 
     # Redefining when bot receive message
     @client.event
     async def on_message(request):
-        # ignore non-prefix
-        prefix = BotConfig().get_botprefix()
-        if not request.content.startswith(prefix):
+
+        # ignore if its lenght 1, fix for just "!"
+        if len(request.content) <= 1:
             return
 
+        # init: prepare args
+        exec_args = ExecArgs(client=client, rqt_msg=request)
+
+        """ First Round of Content Parsing
+            - try to parse with auto modules (content without bot prefix)
+        """
+        for module in auto_modules:
+            exec_resp = module.execute(request.content, exec_args)
+            retval = await handle_exec_response(client, request, exec_resp)
+            if retval != 1:
+                # handled, dont try to parse through command modules
+                return
+
+        """ Second Round of Content Parsing
+            - try to parse with command modules (content with bot prefix)
+        """
+        # drop those that are not command
+        if request.content[0] != BOT_PREFIX:
+            return
+
+        BotLogger().info("----------")
         BotLogger().info("Author: {}".format(request.author))
         BotLogger().info("Server: {}".format(request.server))
         BotLogger().info("Channel: {}".format(request.channel))
@@ -47,63 +72,19 @@ def main():
 
         # prepare execute function
         command = request.content[1:]
-        exec_args = ExecArgs(client=client, rqt_msg=request)
 
         is_success = False
-        for module in modules:
+        for module in cmd_modules:
             # main execute function
             exec_resp = module.execute(command, exec_args)
-
-            if exec_resp.code == 6:
-                # shut down
-                BotLogger().info("Shutting down the bot")
+            retval = await handle_exec_response(client, request, exec_resp)
+            if retval == 0:
                 is_success = True
-                await client.send_message(
-                    request.channel, embed=exec_resp.embed)
-                await client.logout()
-                await client.close()
-                BotLogger().info("Bot is closed.")
-
-            elif exec_resp.code == 200:
-                is_success = True
-                await client.send_message(
-                    request.channel, embed=exec_resp.embed)
-                BotLogger().info(
-                    "Command Executed Success: {}".format(request.content))
-
-            elif exec_resp.code == 201:
-                is_success = True
-                for e in exec_resp.embed:
-                    await client.send_message(
-                        request.channel, embed=e)
-                BotLogger().info(
-                    "Command Executed Success: {}".format(request.content))
-
-            elif exec_resp.code == 300:
-                BotLogger().warning("Permission Error")
-                is_success = True
-                await client.send_message(
-                    request.channel, embed=exec_resp.embed)
-                BotLogger().warning(
-                    "Command Executed Warning: {}".format(request.content))
-
-            elif exec_resp.code == 500:
-                # command not found from module
+                break
+            elif retval == 1:
                 continue
 
-            elif exec_resp.code == 501:
-                BotLogger().error("Parsing Error")
-                is_success = True
-                await client.send_message(
-                    request.channel, embed=exec_resp.embed)
-                BotLogger().error(
-                    "Command Parsing Error: {}".format(request.content))
-
-            else:
-                BotLogger().critical(
-                    "INVALID ExecResp CODE: {}".format(exec_resp.code))
-        # end for module in modules
-
+        # couldn't figure out command, or critical error, print this
         if is_success is False:
             response = "Invalid Command: {}".format(request.content)
             embed = discord.Embed()
@@ -112,12 +93,72 @@ def main():
             await client.send_message(request.channel, embed=embed)
             BotLogger().error(response)
 
-        BotLogger().info("----------")
-
     # run the program
     BotLogger().info("Running Client")
     client.run(BotConfig().get("Keys", "Token"))
+    BotLogger().info("Client shut down.")
+    return
 
 
+async def handle_exec_response(client, request, exec_resp):
+    """ Handles the responses by modules
+        This function can only be called from async function
+        returns:
+            0   for module handled successfully, stop there
+            1   for not handled by module, continue trying
+            -1  for critical error
+    """
+    if exec_resp.code == 6:
+        # shut down
+        BotLogger().info("Shutting down the bot")
+        await client.send_message(
+            request.channel, embed=exec_resp.embed)
+        await client.logout()
+        await client.close()
+        BotLogger().info("Bot is closed.")
+        return 0
+
+    elif exec_resp.code == 200:
+        await client.send_message(
+            request.channel, embed=exec_resp.embed)
+        BotLogger().info(
+            "Command Executed Success: {}".format(request.content))
+        return 0
+
+    elif exec_resp.code == 201:
+        for e in exec_resp.embed:
+            await client.send_message(
+                request.channel, embed=e)
+        BotLogger().info(
+            "Command Executed Success: {}".format(request.content))
+        return 0
+
+    elif exec_resp.code == 300:
+        BotLogger().warning("Permission Error")
+        await client.send_message(
+            request.channel, embed=exec_resp.embed)
+        BotLogger().warning(
+            "Command Executed Warning: {}".format(request.content))
+        return 0
+
+    elif exec_resp.code == 500:
+        # command not found from module
+        return 1
+
+    elif exec_resp.code == 501:
+        BotLogger().error("Parsing Error")
+        await client.send_message(
+            request.channel, embed=exec_resp.embed)
+        BotLogger().error(
+            "Command Parsing Error: {}".format(request.content))
+        return 0
+
+    else:
+        BotLogger().critical(
+            "INVALID ExecResp CODE: {}".format(exec_resp.code))
+        return -1
+
+
+# main function call
 if __name__ == "__main__":
     main()

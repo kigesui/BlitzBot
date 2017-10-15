@@ -10,11 +10,17 @@ class ModuleLoader:
         def __init__(self):
             pass
 
-        def load_modules(self):
-            all_modules = []
-            all_modules.append(PingModule())
-            all_modules.append(HallsModule())
-            return all_modules
+        def load_auto_modules(self):
+            """ Auto modules execute command without bot prefix """
+            auto_modules = []
+            return auto_modules
+
+        def load_cmd_modules(self):
+            """ Command modules execute command after bot prefix """
+            cmd_modules = []
+            cmd_modules.append(PingModule())
+            # cmd_modules.append(HallsModule())
+            return cmd_modules
 
     instance = None
 
@@ -22,8 +28,9 @@ class ModuleLoader:
         if not ModuleLoader.instance:
             ModuleLoader.instance = ModuleLoader.__ModuleLoader()
 
-    def load_modules(self):
-        return ModuleLoader.instance.load_modules()
+    def load_all_modules(self):
+        return (ModuleLoader.instance.load_cmd_modules(),
+                ModuleLoader.instance.load_auto_modules())
 
 
 
