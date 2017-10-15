@@ -20,7 +20,7 @@ def main():
     BotLogger().info("Bot Owners: {}".format(BotConfig().get_owners()))
 
     client = discord.Client()
-    playing_status = 'test'
+    playing_status = "{} prefix".format(BOT_PREFIX)
 
     BotLogger().info("Loading Modules")
     CMD_MODULES, AUTO_MODULES = ModuleLoader().load_all_modules()
@@ -148,10 +148,14 @@ async def handle_exec_response(client, request, exec_resp):
 
     elif exec_resp.code == 300:
         BotLogger().warning("Permission Error")
-        await client.send_message(
-            request.channel, embed=exec_resp.embed)
-        BotLogger().warning(
-            "Command Executed Warning: {}".format(request.content))
+
+        # # dont say anything
+        # embed = discord.Embed()
+        # embed.colour = BotConfig().get_hex("Colors", "OnWarning")
+        # embed.description = "You are not the boss of me!"
+        # await client.send_message(request.channel, embed=embed)
+
+        BotLogger().warning("Need to be bot owner: {}".format(request.content))
         return 0
 
     elif exec_resp.code == 500:

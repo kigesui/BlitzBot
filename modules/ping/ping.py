@@ -3,9 +3,21 @@ from ..i_module import IModule, ExecResp
 from utils.bot_config import BotConfig
 
 from discord import Embed
+from discord import Emoji
 
 
 class PingModule(IModule):
+
+    def __init__(self):
+        self.emoji = Emoji(
+            require_colons = False,
+            managed = False,
+            id = 360233537317634058,
+            name = "dogeflower",
+            roles = [],
+            server = None)
+
+        pass
 
     def execute(self, cmd, exec_args):
         cmd_args = cmd.split(' ')
@@ -13,7 +25,7 @@ class PingModule(IModule):
         command = cmd_args[0]
 
         if command == "ping":
-            msg = "Pong!"
+            msg = "Pong! {}".format(self.emoji)
             embed = Embed()
             embed.colour = BotConfig().get_hex("Colors", "OnSuccess")
             embed.description = msg
@@ -30,18 +42,13 @@ class PingModule(IModule):
             return ExecResp(code=200, embed=embed)
 
         if command == "die":
-            author_id = exec_args.rqt_msg.author.id
-            if author_id in BotConfig().get_owners():
-                msg = "Shutting Down..."
-                embed = Embed()
-                embed.colour = BotConfig().get_hex("Colors", "OnSuccess")
-                embed.description = msg
-                return ExecResp(code=6, embed=embed)
-            else:
-                msg = "You are not the boss of me!"
-                embed = Embed()
-                embed.colour = BotConfig().get_hex("Colors", "OnWarning")
-                embed.description = msg
-                return ExecResp(code=300, embed=embed)
+            if exec_args.rqt_msg.author.id not in BotConfig().get_owners():
+                return ExecResp(code=300)
+
+            msg = "Shutting Down..."
+            embed = Embed()
+            embed.colour = BotConfig().get_hex("Colors", "OnSuccess")
+            embed.description = msg
+            return ExecResp(code=6, embed=embed)
 
         return ExecResp(code=500)

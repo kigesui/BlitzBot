@@ -19,7 +19,7 @@ class ModuleLoader:
             """ Command modules execute command after bot prefix """
             cmd_modules = []
             cmd_modules.append(PingModule())
-            # cmd_modules.append(HallsModule())
+            cmd_modules.append(HallsModule())
             return cmd_modules
 
     instance = None
