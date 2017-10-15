@@ -21,4 +21,12 @@ class PeopleModule(IModule):
             filepath = "./modules/people/pics/blazikeen.gif"
             return ExecResp(code=250, embed=filepath)
 
+        if command == "peetarded":
+            filepath = "./modules/people/pics/peetarded.gif"
+            return ExecResp(code=250, embed=filepath)
+
+        if command == "maoke":
+            filepath = "./modules/people/pics/maoke.png"
+            return ExecResp(code=250, embed=filepath)
+
         return ExecResp(code=500)
