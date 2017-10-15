@@ -17,13 +17,13 @@ def main():
     BOT_PREFIX = BotConfig().get_botprefix()
 
     BotLogger().info("Bot Prefix: {}".format(BOT_PREFIX))
-    # BotLogger().debug("Owners: {}".format(BotConfig().get_owners()))
+    BotLogger().info("Bot Owners: {}".format(BotConfig().get_owners()))
 
     client = discord.Client()
     playing_status = 'test'
 
     BotLogger().info("Loading Modules")
-    cmd_modules, auto_modules = ModuleLoader().load_all_modules()
+    CMD_MODULES, AUTO_MODULES = ModuleLoader().load_all_modules()
 
     # Redefining when bot starts
     @client.event
@@ -50,11 +50,20 @@ def main():
         """ First Round of Content Parsing
             - try to parse with auto modules (content without bot prefix)
         """
-        for module in auto_modules:
+        for module in AUTO_MODULES:
             exec_resp = module.execute(request.content, exec_args)
             retval = await handle_exec_response(client, request, exec_resp)
-            if retval != 1:
+            if retval == 0:
                 # handled, dont try to parse through command modules
+                return
+            elif retval == 1:
+                # not handled, keep looking
+                continue
+            else:
+                # something wrong, check log
+                BotLogger().error(
+                    "Something went wrong while handing {}"
+                    .format(request.content))
                 return
 
         """ Second Round of Content Parsing
@@ -74,7 +83,7 @@ def main():
         command = request.content[1:]
 
         is_success = False
-        for module in cmd_modules:
+        for module in CMD_MODULES:
             # main execute function
             exec_resp = module.execute(command, exec_args)
             retval = await handle_exec_response(client, request, exec_resp)
@@ -83,6 +92,10 @@ def main():
                 break
             elif retval == 1:
                 continue
+            else:
+                # something went wrong, check log
+                is_success = False
+                break
 
         # couldn't figure out command, or critical error, print this
         if is_success is False:
