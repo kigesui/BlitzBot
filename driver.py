@@ -146,11 +146,20 @@ async def handle_exec_response(client, request, exec_resp):
             "Command Executed Success: {}".format(request.content))
         return 0
 
+    elif exec_resp.code == 230:
+        emoji = exec_resp.embed
+        message = request
+        BotLogger().info("Adding Reaction: {}".format(emoji))
+        await client.add_reaction(request, emoji)
+        BotLogger().info("Command Executed Success: {}"
+                         .format(request.content))
+        return 0
+
     elif exec_resp.code == 250:
         filepath = exec_resp.embed
+        BotLogger().info("Uploading File: {}".format(filepath))
         with open(filepath, 'rb') as f:
             await client.send_file(request.channel, f)
-        BotLogger().info("File Uploaded: {}".format(filepath))
         BotLogger().info("Command Executed Success: {}"
                          .format(request.content))
         return 0

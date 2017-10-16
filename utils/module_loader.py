@@ -1,6 +1,7 @@
 # from utils.bot_logger import BotLogger
 
 # modules import
+from modules.automodules.react import AutoReactModule
 from modules.ping.ping import PingModule
 from modules.halls.halls import HallsModule
 from modules.people.people import PeopleModule
@@ -14,6 +15,7 @@ class ModuleLoader:
         def load_auto_modules(self):
             """ Auto modules execute command without bot prefix """
             auto_modules = []
+            auto_modules.append(AutoReactModule())
             return auto_modules
 
         def load_cmd_modules(self):
