@@ -176,19 +176,18 @@ class HallFlower(IModule):
             ''' throw stuff at someone '''
             # BotLogger().debug(cmd_args)
             # BotLogger().debug(exec_args.rqt_msg.mentions)
-            if (len(cmd_args) != 3 or
-               len(exec_args.rqt_msg.mentions) == 0 or
-               not cmd_args[1].isdecimal()):
+            if not (len(cmd_args) == 2 and
+                    len(exec_args.rqt_msg.mentions) == 1):
                 embed = Embed()
                 embed.colour = BotConfig().get_hex("Colors", "OnError")
                 embed.description = \
-                    "Usage: {}giveflower 1 @someone".format(
+                    "Usage: {}giveflower @someone".format(
                         BotConfig().get_botprefix() )
                 return ExecResp(code=501, embed=embed)
 
             src_usr = exec_args.rqt_msg.author
             tgt_usr = exec_args.rqt_msg.mentions[0]
-            amount = cmd_args[1]
+            amount = 1
 
             # save to leaderboard
             if tgt_usr.id in self.__hall_flower:
