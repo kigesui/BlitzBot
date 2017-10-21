@@ -2,6 +2,7 @@ import discord
 # from discord.ext.commands import Bot
 # from discord.ext import commands
 from time import strftime, localtime
+import traceback
 
 from modules.i_module import ExecArgs
 from utils.bot_logger import BotLogger
@@ -196,4 +197,7 @@ async def handle_exec_response(client, request, exec_resp):
 
 # main function call
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as e:
+        BotLogger().error(traceback.format_exc())
