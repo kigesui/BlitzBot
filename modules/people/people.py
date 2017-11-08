@@ -14,20 +14,20 @@ class PeopleModule(IModule):
 
         # ignore if there are arguments
         if len(cmd_args) > 1:
-            return ExecResp(code=500)
+            return None
 
         command = cmd_args[0]
 
         if re.match("blazik[e]+[n]+$", command):
             filepath = "./modules/people/pics/blazikeen.gif"
-            return ExecResp(code=250, embed=filepath)
+            return [ExecResp(code=240, embed=filepath)]
 
         if re.match("p[e]*tarded$", command):
             filepath = "./modules/people/pics/peetarded.gif"
-            return ExecResp(code=250, embed=filepath)
+            return [ExecResp(code=240, embed=filepath)]
 
         if command == "maoke":
             filepath = "./modules/people/pics/maoke.png"
-            return ExecResp(code=250, embed=filepath)
+            return [ExecResp(code=240, embed=filepath)]
 
-        return ExecResp(code=500)
+        return None
