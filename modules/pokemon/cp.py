@@ -13,14 +13,23 @@ class CpModule(IModule):
     def execute(self, cmd, exec_args):
         cmd_args = cmd.split(' ')
 
-        command = ' '.join(cmd_args[0:])
+        command = cmd_args[0]
 
-        if re.match("cp [a-zA-Z]+$", command):
+        if command == "cp":
+            # BotLogger().debug("CP")
+            if not re.match("cp [a-zA-Z]+$", cmd):
+                embed = Embed()
+                embed.colour = BotConfig().get_hex("Colors", "OnError")
+                embed.description = "Usage: {}cp pokemon_name".format(
+                                    BotConfig().get_botprefix() )
+                return [ExecResp(code=500, embed=embed)]
+
             embed = Embed()
             embed.colour = BotConfig().get_hex("Colors", "OnSuccess")
             embed.description = "place holder"
-            return ExecResp(code=200, embed=embed)
-        return ExecResp(code=500)
+            return [ExecResp(code=200, embed=embed)]
+
+        return None
 
     def get_cps(self):
         return {1: 123, 2: 234}
