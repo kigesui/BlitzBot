@@ -102,7 +102,7 @@ class HallFlower(IModule):
                 embed.description = \
                     "Usage: {}leaderboardflower or {}lbp".format(
                         prefix, prefix)
-                return ExecResp(code=501, embed=embed)
+                return [ExecResp(code=500, embed=embed)]
 
             # refresh table
             self.__load_table()
@@ -131,7 +131,7 @@ class HallFlower(IModule):
                                                      self.__emoji),
                                 inline=True)
             # return
-            return ExecResp(code=200, embed=embed)
+            return [ExecResp(code=200, embed=embed)]
 
         # """
         # show self amount
@@ -146,7 +146,7 @@ class HallFlower(IModule):
                 prefix = BotConfig().get_botprefix()
                 embed.description = "Usage: {}$ or {}$ @someone".format(
                                     prefix, prefix)
-                return ExecResp(code=501, embed=embed)
+                return [ExecResp(code=500, embed=embed)]
 
             # refresh table
             self.__load_table()
@@ -167,7 +167,7 @@ class HallFlower(IModule):
             embed.colour = BotConfig().get_hex("Colors", "OnSuccess")
             embed.description = "{} has {} {}".format(
                                 tgt_usr.mention, amount, self.__emoji)
-            return ExecResp(code=200, embed=embed)
+            return [ExecResp(code=200, embed=embed)]
 
         # """
         # throw flower
@@ -183,7 +183,7 @@ class HallFlower(IModule):
                 embed.description = \
                     "Usage: {}giveflower @someone".format(
                         BotConfig().get_botprefix() )
-                return ExecResp(code=501, embed=embed)
+                return [ExecResp(code=500, embed=embed)]
 
             src_usr = exec_args.rqt_msg.author
             tgt_usr = exec_args.rqt_msg.mentions[0]
@@ -204,7 +204,7 @@ class HallFlower(IModule):
             embed.description = "**{}** gave {} {} to {}.".format(
                                 src_usr_nick, amount, self.__emoji,
                                 tgt_usr.mention)
-            return ExecResp(code=200, embed=embed)
+            return [ExecResp(code=200, embed=embed)]
 
         # """
         # take flower
@@ -219,11 +219,11 @@ class HallFlower(IModule):
                 embed.colour = BotConfig().get_hex("Colors", "OnError")
                 embed.description = "Usage: {}take 1 @someone".format(
                                     BotConfig().get_botprefix() )
-                return ExecResp(code=501, embed=embed)
+                return [ExecResp(code=500, embed=embed)]
 
             # check bot owner
             if exec_args.rqt_msg.author.id not in BotConfig().get_owners():
-                return ExecResp(code=300)
+                return [ExecResp(code=300)]
 
             src_usr = exec_args.rqt_msg.author
             tgt_usr = exec_args.rqt_msg.mentions[0]
@@ -242,9 +242,9 @@ class HallFlower(IModule):
             # create response
             embed = Embed()
             embed.colour = BotConfig().get_hex("Colors", "OnSuccess")
-            embed.description = "**{}** cleaned {} {} from {}.".format(
+            embed.description = "**{}** pulled {} {} from {}.".format(
                                 src_usr_nick, amount, self.__emoji,
                                 tgt_usr.mention)
-            return ExecResp(code=200, embed=embed)
+            return [ExecResp(code=200, embed=embed)]
 
-        return ExecResp(code=500)
+        return None
