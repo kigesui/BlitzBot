@@ -52,20 +52,21 @@ def main():
             - try to parse with auto modules (content without bot prefix)
         """
         for module in AUTO_MODULES:
-            exec_resp = module.execute(request.content, exec_args)
-            retval = await handle_exec_response(client, request, exec_resp)
-            if retval == 0:
-                # handled, dont try to parse through command modules
-                return
-            elif retval == 1:
-                # not handled, keep looking
-                continue
-            else:
-                # something wrong, check log
-                BotLogger().error(
-                    "Something went wrong while handing {}"
-                    .format(request.content))
-                return
+            # main execute function
+            exec_resps = module.execute(request.content, exec_args)
+
+            # if module has response
+            if exec_resps:
+                retval = await handle_multi_resps(client, request, exec_resps)
+                if retval == 0:
+                    # handled, dont try to parse through command modules
+                    return
+                else:
+                    # something wrong, check log
+                    BotLogger().error(
+                        "Something went wrong while handing {}"
+                        .format(request.content))
+                    return
 
         """ Second Round of Content Parsing
             - try to parse with command modules (content with bot prefix)
@@ -86,16 +87,17 @@ def main():
         is_success = False
         for module in CMD_MODULES:
             # main execute function
-            exec_resp = module.execute(command, exec_args)
-            retval = await handle_exec_response(client, request, exec_resp)
-            if retval == 0:
-                is_success = True
-                break
-            elif retval == 1:
-                continue
-            else:
-                # something went wrong, check log
-                is_success = False
+            exec_resps = module.execute(command, exec_args)
+
+            # if module has response
+            if exec_resps:
+                retval = await handle_multi_resps(client, request, exec_resps)
+                if retval == 0:
+                    is_success = True
+                else:
+                    # something went wrong, check log
+                    is_success = False
+                # command usually handled by first module in line
                 break
 
         # couldn't figure out command, or critical error, print this
@@ -114,12 +116,28 @@ def main():
     return
 
 
-async def handle_exec_response(client, request, exec_resp):
-    """ Handles the responses by modules
+async def handle_multi_resps(client, request, exec_responses):
+    """ Handle a list of responses
+        pass each one through the function that handles a single one
+        returns:
+            0   for module handled successfully, stop there
+            1   for not handled by a module, continue trying
+            -1  for critical error
+    """
+    for resp in exec_responses:
+        retval = await handle_single_resp(client, request, resp)
+        if retval == -1:
+            return -1
+
+    return 0
+
+
+async def handle_single_resp(client, request, exec_resp):
+    """ Handle a single response
         This function can only be called from async function
         returns:
             0   for module handled successfully, stop there
-            1   for not handled by module, continue trying
+            1   for not handled by a module, continue trying
             -1  for critical error
     """
     if exec_resp.code == 6:
@@ -147,7 +165,7 @@ async def handle_exec_response(client, request, exec_resp):
             "Command Executed Success: {}".format(request.content))
         return 0
 
-    elif exec_resp.code == 230:
+    elif exec_resp.code == 220:
         emoji = exec_resp.embed
         message = request
         BotLogger().info("Adding Reaction: {}".format(emoji))
@@ -156,7 +174,7 @@ async def handle_exec_response(client, request, exec_resp):
                          .format(request.content))
         return 0
 
-    elif exec_resp.code == 250:
+    elif exec_resp.code == 240:
         filepath = exec_resp.embed
         BotLogger().info("Uploading File: {}".format(filepath))
         with open(filepath, 'rb') as f:
@@ -178,10 +196,6 @@ async def handle_exec_response(client, request, exec_resp):
         return 0
 
     elif exec_resp.code == 500:
-        # command not found from module
-        return 1
-
-    elif exec_resp.code == 501:
         BotLogger().error("Parsing Error")
         await client.send_message(
             request.channel, embed=exec_resp.embed)

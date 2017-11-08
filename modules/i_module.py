@@ -19,12 +19,10 @@ class ExecResp(namedtuple('ExecResp', [ "code", "embed"])):
         # -1 = not set
         # 6 = shutdown
         # 200 = success, one embed
-        # 201 = success, list of embed
-        # 230 = success, react with emoji
-        # 250 = success, upload picture
+        # 220 = success, react with emoji
+        # 240 = success, upload picture
         # 300 = warning permission error, not owner
-        # 500 = error, command does not belong to module
-        # 501 = error, command can't be parsed
+        # 500 = error, command can't be parsed
         return super(ExecResp, cls).__new__(cls, code, embed)
 
 
@@ -34,6 +32,9 @@ class IModule:
     """
     __metaclass__ = ABCMeta
 
+    """
+    execute returns a list of ExecResp
+    """
     @abstractmethod
     def execute(self, cmd, exec_args):
         raise NotImplementedError

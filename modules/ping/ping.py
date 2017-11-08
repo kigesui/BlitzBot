@@ -29,7 +29,7 @@ class PingModule(IModule):
             embed = Embed()
             embed.colour = BotConfig().get_hex("Colors", "OnSuccess")
             embed.description = msg
-            return ExecResp(code=200, embed=embed)
+            return [ExecResp(code=200, embed=embed)]
 
         if command == "hentai":
             usr = exec_args.rqt_msg.author
@@ -39,16 +39,16 @@ class PingModule(IModule):
             embed = Embed()
             embed.colour = BotConfig().get_hex("Colors", "OnSuccess")
             embed.description = msg
-            return ExecResp(code=200, embed=embed)
+            return [ExecResp(code=200, embed=embed)]
 
         if command == "die":
             if exec_args.rqt_msg.author.id not in BotConfig().get_owners():
-                return ExecResp(code=300)
+                return [ExecResp(code=300)]
 
             msg = "Shutting Down..."
             embed = Embed()
             embed.colour = BotConfig().get_hex("Colors", "OnSuccess")
             embed.description = msg
-            return ExecResp(code=6, embed=embed)
+            return [ExecResp(code=6, embed=embed)]
 
-        return ExecResp(code=500)
+        return None
