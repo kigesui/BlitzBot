@@ -10,20 +10,21 @@ class ExecArgs(namedtuple('ExecArgs', [ "client", "rqt_msg"])):
         return super(ExecArgs, cls).__new__(cls, client, rqt_msg)
 
 
-class ExecResp(namedtuple('ExecResp', [ "code", "embed"])):
+class ExecResp(namedtuple('ExecResp', [ "code", "args"])):
     """
     Class returned by execute function
     """
-    def __new__(cls, code=-1, embed=None):
+    def __new__(cls, code=-1, args=None):
         # code
         # -1 = not set
         # 6 = shutdown
-        # 200 = success, one embed
-        # 220 = success, react with emoji
-        # 240 = success, upload picture
+        # 200 = success, outputs embed text, args = embed
+        # 210 = success, outputs normal text, args = normal text
+        # 220 = success, react with emoji, args = discord.Emoji
+        # 240 = success, upload picture, args = filepath
         # 300 = warning permission error, not owner
         # 500 = error, command can't be parsed
-        return super(ExecResp, cls).__new__(cls, code, embed)
+        return super(ExecResp, cls).__new__(cls, code, args)
 
 
 class IModule:

@@ -144,7 +144,7 @@ async def handle_single_resp(client, request, exec_resp):
         # shut down
         BotLogger().info("Shutting down the bot")
         await client.send_message(
-            request.channel, embed=exec_resp.embed)
+            request.channel, embed=exec_resp.args)
         await client.logout()
         await client.close()
         BotLogger().info("Bot is closed.")
@@ -152,21 +152,20 @@ async def handle_single_resp(client, request, exec_resp):
 
     elif exec_resp.code == 200:
         await client.send_message(
-            request.channel, embed=exec_resp.embed)
+            request.channel, embed=exec_resp.args)
         BotLogger().info(
             "Command Executed Success: {}".format(request.content))
         return 0
 
-    elif exec_resp.code == 201:
-        for e in exec_resp.embed:
-            await client.send_message(
-                request.channel, embed=e)
+    elif exec_resp.code == 210:
+        message = exec_resp.args
+        await client.send_message(request.channel, message)
         BotLogger().info(
             "Command Executed Success: {}".format(request.content))
         return 0
 
     elif exec_resp.code == 220:
-        emoji = exec_resp.embed
+        emoji = exec_resp.args
         message = request
         BotLogger().info("Adding Reaction: {}".format(emoji))
         await client.add_reaction(request, emoji)
@@ -175,7 +174,7 @@ async def handle_single_resp(client, request, exec_resp):
         return 0
 
     elif exec_resp.code == 240:
-        filepath = exec_resp.embed
+        filepath = exec_resp.args
         BotLogger().info("Uploading File: {}".format(filepath))
         with open(filepath, 'rb') as f:
             await client.send_file(request.channel, f)
@@ -198,7 +197,7 @@ async def handle_single_resp(client, request, exec_resp):
     elif exec_resp.code == 500:
         BotLogger().error("Parsing Error")
         await client.send_message(
-            request.channel, embed=exec_resp.embed)
+            request.channel, embed=exec_resp.args)
         BotLogger().error(
             "Command Parsing Error: {}".format(request.content))
         return 0

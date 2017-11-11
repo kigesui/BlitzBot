@@ -1,6 +1,6 @@
 from ..i_module import IModule, ExecResp
 # from utils.bot_logger import BotLogger
-from utils.bot_config import BotConfig
+# from utils.bot_config import BotConfig
 import re
 
 
@@ -20,14 +20,14 @@ class PeopleModule(IModule):
 
         if re.match("blazik[e]+[n]+$", command):
             filepath = "./modules/people/pics/blazikeen.gif"
-            return [ExecResp(code=240, embed=filepath)]
+            return [ExecResp(code=240, args=filepath)]
 
         if re.match("p[e]*tarded$", command):
             filepath = "./modules/people/pics/peetarded.gif"
-            return [ExecResp(code=240, embed=filepath)]
+            return [ExecResp(code=240, args=filepath)]
 
         if command == "maoke":
             filepath = "./modules/people/pics/maoke.png"
-            return [ExecResp(code=240, embed=filepath)]
+            return [ExecResp(code=240, args=filepath)]
 
         return None

@@ -23,7 +23,7 @@ class CpModule(IModule):
                 embed.colour = BotConfig().get_hex("Colors", "OnError")
                 embed.description = "Usage: {}cp pokemon_name".format(
                                     BotConfig().get_botprefix())
-                return [ExecResp(code=500, embed=embed)]
+                return [ExecResp(code=500, args=embed)]
 
             cp_multiplier = [
                 0.094, 0.16639787, 0.21573247, 0.25572005, 0.29024988,
@@ -60,12 +60,12 @@ class CpModule(IModule):
                     temp = i.split()
                     if re.match(temp[0], cmd_args[1], re.IGNORECASE):
                         embed = make_embed(temp[1], temp[2], temp[3])
-                        return [ExecResp(code=200, embed=embed)]
+                        return [ExecResp(code=200, args=embed)]
 
             embed = Embed()
             embed.colour = BotConfig().get_hex("Colors", "OnError")
             embed.description = "{} is not a pokemon".format(cmd_args[1])
-            return [ExecResp(code=500, embed=embed)]
+            return [ExecResp(code=500, args=embed)]
         return None
 
     def _compute_cp(self, attack, defense, stamina, cp_multiplier):

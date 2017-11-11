@@ -92,7 +92,7 @@ class HallPoop(IModule):
                 prefix = BotConfig().get_botprefix()
                 embed.description = "Usage: {}leaderboardpoop or {}lbp".format(
                                     prefix, prefix)
-                return [ExecResp(code=500, embed=embed)]
+                return [ExecResp(code=500, args=embed)]
 
             # refresh table
             self.__load_table()
@@ -121,7 +121,7 @@ class HallPoop(IModule):
                                                      self.__emoji),
                                 inline=True)
             # return
-            return [ExecResp(code=200, embed=embed)]
+            return [ExecResp(code=200, args=embed)]
 
         # """
         # show self amount
@@ -137,7 +137,7 @@ class HallPoop(IModule):
                 embed.description = \
                     "Usage: {}showpoop or {}showpoop @someone".format(
                         prefix, prefix)
-                return [ExecResp(code=500, embed=embed)]
+                return [ExecResp(code=500, args=embed)]
 
             # refresh table
             self.__load_table()
@@ -158,7 +158,7 @@ class HallPoop(IModule):
             embed.colour = BotConfig().get_hex("Colors", "OnSuccess")
             embed.description = "{} holds {} {}".format(
                                 tgt_usr.mention, amount, self.__emoji)
-            return [ExecResp(code=200, embed=embed)]
+            return [ExecResp(code=200, args=embed)]
 
         # """
         # throw poop
@@ -173,7 +173,7 @@ class HallPoop(IModule):
                 embed.colour = BotConfig().get_hex("Colors", "OnError")
                 embed.description = "Usage: {}throwpoop @someone".format(
                                     BotConfig().get_botprefix() )
-                return [ExecResp(code=500, embed=embed)]
+                return [ExecResp(code=500, args=embed)]
 
             src_usr = exec_args.rqt_msg.author
             tgt_usr = exec_args.rqt_msg.mentions[0]
@@ -194,7 +194,7 @@ class HallPoop(IModule):
             embed.description = "**{}** throw {} {} at {}.".format(
                                 src_usr_nick, amount, self.__emoji,
                                 tgt_usr.mention)
-            return [ExecResp(code=200, embed=embed)]
+            return [ExecResp(code=200, args=embed)]
 
         # """
         # clean poop
@@ -209,7 +209,7 @@ class HallPoop(IModule):
                 embed.colour = BotConfig().get_hex("Colors", "OnError")
                 embed.description = "Usage: {}clean 1 @someone".format(
                                     BotConfig().get_botprefix() )
-                return [ExecResp(code=500, embed=embed)]
+                return [ExecResp(code=500, args=embed)]
 
             # check bot owner
             if exec_args.rqt_msg.author.id not in BotConfig().get_owners():
@@ -235,6 +235,6 @@ class HallPoop(IModule):
             embed.description = "**{}** took {} {} from {}.".format(
                                 src_usr_nick, amount, self.__emoji,
                                 tgt_usr.mention)
-            return [ExecResp(code=200, embed=embed)]
+            return [ExecResp(code=200, args=embed)]
 
         return None

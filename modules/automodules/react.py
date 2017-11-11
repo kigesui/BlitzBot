@@ -20,6 +20,6 @@ class AutoReactModule(IModule):
     def execute(self, cmd, exec_args):
 
         if "entai" in cmd.lower():
-            return [ExecResp(code=220, embed=self.__emoji_hentai)]
+            return [ExecResp(code=220, args=self.__emoji_hentai)]
 
         return None
