@@ -6,6 +6,7 @@ from modules.ping.ping import PingModule
 from modules.halls.halls import HallsModule
 from modules.people.people import PeopleModule
 from modules.pokemon.cp import CpModule
+from modules.eat.eat import EatModule
 
 
 class ModuleLoader:
@@ -26,6 +27,7 @@ class ModuleLoader:
             cmd_modules.append(HallsModule())
             cmd_modules.append(PeopleModule())
             cmd_modules.append(CpModule())
+            cmd_modules.append(EatModule())
             return cmd_modules
 
     instance = None
