@@ -15,8 +15,8 @@ class EatModule(IModule):
     def execute(self, cmd, exec_args):
         cmd_args = cmd.split(' ')
         command = cmd_args[0]
-        if command == 'eat':
-            if not re.match("eat$", cmd):
+        if command == "eat":
+            if not re.match("^eat$", cmd):
                 embed = Embed()
                 embed.colour = BotConfig().get_hex("Colors", "OnError")
                 embed.description = "Usage: {}eat".format(

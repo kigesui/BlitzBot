@@ -40,7 +40,7 @@ class CpModule(IModule):
 
         if command == "cp":
             # BotLogger().debug("CP")
-            if not re.match("cp [a-zA-Z]+$", cmd):
+            if not re.match("^cp [a-zA-Z]+$", cmd):
                 embed = Embed()
                 embed.colour = BotConfig().get_hex("Colors", "OnError")
                 embed.description = "Usage: {}cp pokemon_name".format(
@@ -80,7 +80,7 @@ class CpModule(IModule):
             return [ExecResp(code=500, args=embed)]
 
         if command == "cpstr":
-            if not re.match("cpstr [a-zA-Z]+$", cmd):
+            if not re.match("^cpstr [a-zA-Z]+$", cmd):
                 embed = Embed()
                 embed.colour = BotConfig().get_hex("Colors", "OnError")
                 embed.description = "Usage: {}cpstr pokemon_name".format(
