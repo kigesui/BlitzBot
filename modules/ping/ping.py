@@ -17,7 +17,7 @@ class PingModule(IModule):
             roles = [],
             server = None)
 
-        pass
+        return
 
     def execute(self, cmd, exec_args):
         cmd_args = cmd.split(' ')

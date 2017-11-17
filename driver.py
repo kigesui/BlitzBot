@@ -76,7 +76,7 @@ def main():
         """ Second Round of Content Parsing
             - try to parse with command modules (content with bot prefix)
         """
-        # drop those that are not command
+        # drop stuff not starting with prefix
         if request.content[0] != BOT_PREFIX:
             return
 
@@ -218,7 +218,7 @@ async def handle_single_resp(client, request, exec_resp):
 
 
 def ignore_content(content):
-    if re.match("^\{}+$".format(BOT_PREFIX), content):
+    if re.match("^[\\"+BOT_PREFIX+"]{2}.*$", content):
         BotLogger().info("Ignoring content: {}".format(content))
         return True
     return False
