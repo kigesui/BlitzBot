@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# check requirements
+python3 -m pip install -r requirements.txt
+
 # check log folder
 LOG_DIR='./logs'
 if [ ! -d "$LOG_DIR" ]; then

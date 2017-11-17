@@ -18,11 +18,11 @@ class PeopleModule(IModule):
 
         command = cmd_args[0]
 
-        if re.match("blazik[e]+[n]+$", command):
+        if re.match("^blazik[e]+[n]+$", command):
             filepath = "./modules/people/pics/blazikeen.gif"
             return [ExecResp(code=240, args=filepath)]
 
-        if re.match("p[e]*tarded$", command):
+        if re.match("^p[e]*tarded$", command):
             filepath = "./modules/people/pics/peetarded.gif"
             return [ExecResp(code=240, args=filepath)]
 
