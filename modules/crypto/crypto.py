@@ -3,6 +3,7 @@ from utils.bot_config import BotConfig
 from utils.bot_logger import BotLogger
 from Crypto.Cipher import ARC4
 import base64
+import binascii
 import re
 
 from discord import Embed
@@ -61,12 +62,13 @@ class CryptoModule(IModule):
 
             key = cmd_args[1]
             b64cipher = ' '.join(cmd_args[2:])
-            # string to byte + decode
-            b64cipher = b64cipher.encode('UTF-8')
-            cipher = base64.b64decode(b64cipher)
 
-            # decrypt
             try:
+                # string to byte + decode
+                b64cipher = b64cipher.encode('UTF-8')
+                cipher = base64.b64decode(b64cipher)
+
+                # decrypt
                 rc4 = ARC4.new(key)
                 msg = rc4.decrypt(cipher)
                 msg = msg.decode('UTF-8')
@@ -75,12 +77,17 @@ class CryptoModule(IModule):
                 embed.colour = BotConfig().get_hex("Colors", "OnSuccess")
                 embed.description = msg
                 return [ExecResp(code=200, args=embed)]
+            except binascii.Error:
+                BotLogger().warning("Cannot decrypt: cipher wrong size")
+                embed = Embed()
+                embed.colour = BotConfig().get_hex("Colors", "OnError")
+                embed.description = "Invalid Cipher"
+                return [ExecResp(code=500, args=embed)]
             except UnicodeDecodeError:
                 BotLogger().warning("Cannot decrypt: wrong key")
                 embed = Embed()
                 embed.colour = BotConfig().get_hex("Colors", "OnError")
                 embed.description = "Invalid Key"
                 return [ExecResp(code=500, args=embed)]
-
 
         return None
