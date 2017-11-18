@@ -22,7 +22,6 @@ class CryptoModule(IModule):
     def decrypt(key, cipher):
         return None
 
-
     def execute(self, cmd, exec_args):
         cmd_args = cmd.split(' ')
         command = cmd_args[0]
