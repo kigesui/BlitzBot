@@ -8,6 +8,7 @@ from modules.people.people import PeopleModule
 from modules.pokemon.cp import CpModule
 from modules.eat.eat import EatModule
 from modules.crypto.crypto import CryptoModule
+from modules.ns.fetch import FetchModule
 
 
 class ModuleLoader:
@@ -30,6 +31,7 @@ class ModuleLoader:
             cmd_modules.append(CpModule())
             cmd_modules.append(EatModule())
             cmd_modules.append(CryptoModule())
+            cmd_modules.append(FetchModule())
             return cmd_modules
 
     instance = None
