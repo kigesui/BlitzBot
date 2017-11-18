@@ -1,7 +1,6 @@
 #!/bin/sh
 
-# check requirements
-python3 -m pip install -r requirements.txt
+make init
 
 # check log folder
 LOG_DIR='./logs'
@@ -13,7 +12,7 @@ fi
 # check db folder
 SQLITE_DIR='./data'
 if [ ! -d "$SQLITE_DIR" ]; then
-  echo "creating directory for directory ..."
+  echo "creating directory for data ..."
   mkdir $SQLITE_DIR
 fi
 
