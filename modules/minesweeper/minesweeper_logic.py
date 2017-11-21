@@ -37,10 +37,10 @@ class Board:
 
     # print
     def __str__(self):
-        board_str = "   |"
+        board_str = "___|"
         # print col header
         for i in range(self.width):
-            board_str += "{:>3}".format(chr(0x40+i+1))
+            board_str += "{:_>3}".format(chr(0x40+i+1))
 
         # print each row
         for y in range(self.height):
@@ -74,3 +74,22 @@ class Board:
             self.mines.append(Mine(x, y))
 
         return
+
+    # game won
+    def game_won(self):
+        return False
+
+    # game lose
+    def game_lose(self):
+        return False
+
+    # reveal
+    # returns false if fail
+    def reveal(self, x, y):
+        return False
+
+    # flag
+    # returns false if fail
+    def flag(self, x, y):
+        return False
+

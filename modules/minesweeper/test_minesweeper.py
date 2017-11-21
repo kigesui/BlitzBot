@@ -58,15 +58,16 @@ class TestMinesweeperLogic(unittest.TestCase):
     def test_win1(self):
         board = Board()
         board.init(7, 4, 1, 0)
+        # shouldnt win: nothing revealed
         self.assertEqual(board._game_won(), False)
         return
 
     def test_win2(self):
         #  | A  B  C  D  E  F  G |
-        # 1|    1  *  1          |
-        # 2|    1  1  1          |
-        # 3|                     |
-        # 4|                     |
+        # 1| 0  1  x  1  0  0  0 |
+        # 2| 0  1  1  1  0  0  0 |
+        # 3| 0  0  0  0  0  0  0 |
+        # 4| 0  0  0  0  0  0  0 |
         board = Board()
         board.init(7, 4, 1, 0)
         board.cells = [board.REVEALED[0]] * 28
@@ -80,14 +81,121 @@ class TestMinesweeperLogic(unittest.TestCase):
         board.cells[9] = board.REVEALED[1]
         board.cells[10] = board.REVEALED[1]
 
-        print("printing.........")
-        print(str(board))
+        # print("printing.........")
+        # print(str(board))
 
-        # should win
+        # should win: blank is mine
+        self.assertEqual(board._game_won(), True)
+        return
 
+    def test_win3(self):
+        #  | A  B  C  D  E  F  G |
+        # 1| 0  1  x  1  0  0  0 |
+        # 2| 0  1  1  1  0  0  0 |
+        # 3| 0  0  0  0  0  1  1 |
+        # 4| 0  0  0  0  0  1  F |
+        board = Board()
+        board.init(7, 4, 2, 0)
+        board.cells = [board.REVEALED[0]] * 28
+        board.mines[0].x = 3
+        board.mines[0].y = 1
+
+        board.mines[1].x = 7
+        board.mines[1].y = 4
+
+        board.cells[2] = board.UNREVEALED
+        board.cells[1] = board.REVEALED[1]
+        board.cells[3] = board.REVEALED[1]
+        board.cells[8] = board.REVEALED[1]
+        board.cells[9] = board.REVEALED[1]
+        board.cells[10] = board.REVEALED[1]
+
+        board.cells[27] = board.FLAG
+        board.cells[19] = board.REVEALED[1]
+        board.cells[20] = board.REVEALED[1]
+        board.cells[26] = board.REVEALED[1]
+
+        # print("\n"+str(board))
+
+        # game is won: flagged or blank are mines
+        self.assertEqual(board._game_won(), True)
+        return
+
+    def test_win4(self):
+        #  | A  B  C  D  E  F  G |
+        # 1|    1  x  1          |
+        # 2|    1  1  1          |
+        # 3|                     |
+        # 4|                     |
+        board = Board()
+        board.init(7, 4, 1, 0)
+        board.cells = [board.UNREVEALED] * 28
+        board.mines[0].x = 3
+        board.mines[0].y = 1
+
+        board.cells[2] = board.UNREVEALED
+        board.cells[1] = board.REVEALED[1]
+        board.cells[3] = board.REVEALED[1]
+        board.cells[8] = board.REVEALED[1]
+        board.cells[9] = board.REVEALED[1]
+        board.cells[10] = board.REVEALED[1]
+
+        # print("printing.........")
+        # print(str(board))
+
+        # shouldnt win: not all revealed
+        self.assertEqual(board._game_won(), False)
         return
 
     def test_lose1(self):
+        board = Board()
+        board.init(7, 4, 1, 0)
+        self.assertEqual(board._game_lose(), False)
+        return
+
+    def test_lose2(self):
+        #  | A  B  C  D  E  F  G |
+        # 1|    1  x  1          |
+        # 2|    1  1  1          |
+        # 3|                     |
+        # 4|                     |
+
+        board = Board()
+        board.init(7, 4, 1, 0)
+        board.cells = [board.UNREVEALED] * 28
+        board.mines[0].x = 3
+        board.mines[0].y = 1
+        board.cells[2] = board.UNREVEALED
+        board.cells[1] = board.REVEALED[1]
+        board.cells[3] = board.REVEALED[1]
+        board.cells[8] = board.REVEALED[1]
+        board.cells[9] = board.REVEALED[1]
+        board.cells[10] = board.REVEALED[1]
+        # no mines are revealed
+        self.assertEqual(board._game_lose(), False)
+        return
+
+    def test_lose3(self):
+        #  | A  B  C  D  E  F  G |
+        # 1|    1  *  1          |
+        # 2|    1  1  1          |
+        # 3|                     |
+        # 4|                     |
+
+        board = Board()
+        board.init(7, 4, 1, 0)
+        board.cells = [board.UNREVEALED] * 28
+        board.mines[0].x = 3
+        board.mines[0].y = 1
+
+        board.cells[2] = board.MINE
+        board.cells[1] = board.REVEALED[1]
+        board.cells[3] = board.REVEALED[1]
+        board.cells[8] = board.REVEALED[1]
+        board.cells[9] = board.REVEALED[1]
+        board.cells[10] = board.REVEALED[1]
+        # one mine is revealed
+        self.assertEqual(board._game_lose(), True)
         return
 
     def test_reveal(self):
