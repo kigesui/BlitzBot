@@ -1,5 +1,5 @@
 from ..i_module import IModule, ExecResp
-from utils.bot_logger import BotLogger
+# from utils.bot_logger import BotLogger
 from utils.bot_config import BotConfig
 import math
 import re
@@ -8,7 +8,7 @@ from discord import Embed
 
 class CpModule(IModule):
 
-    __POKEMON_REGEX = "[\.a-zA-Z\']+"
+    __POKEMON_REGEX = "[\.a-zA-Z\'\-]+"
 
     __CP_MULTIPLIER = [
         0.094, 0.16639787, 0.21573247, 0.25572005, 0.29024988,
