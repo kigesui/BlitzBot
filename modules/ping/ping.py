@@ -1,8 +1,8 @@
 from ..i_module import IModule, ExecResp
 # from utils.bot_logger import BotLogger
 from utils.bot_config import BotConfig
+from utils.bot_embed_helper import EmbedHelper
 
-from discord import Embed
 from discord import Emoji
 
 
@@ -30,9 +30,7 @@ class PingModule(IModule):
 
         if command == "ping2":
             msg = "Pong! {}".format(self.emoji)
-            embed = Embed()
-            embed.colour = BotConfig().get_hex("Colors", "OnSuccess")
-            embed.description = msg
+            embed = EmbedHelper.success(msg)
             return [ExecResp(code=200, args=embed)]
 
         if command == "hentai":
@@ -40,9 +38,7 @@ class PingModule(IModule):
             hen = '\U0001F414'
             tai = '\U0001F454'
             msg = "{} {}{}".format(usr.mention, hen, tai)
-            embed = Embed()
-            embed.colour = BotConfig().get_hex("Colors", "OnSuccess")
-            embed.description = msg
+            embed = EmbedHelper.success(msg)
             return [ExecResp(code=200, args=embed)]
 
         if command == "die":
@@ -50,9 +46,7 @@ class PingModule(IModule):
                 return [ExecResp(code=300)]
 
             msg = "Shutting Down..."
-            embed = Embed()
-            embed.colour = BotConfig().get_hex("Colors", "OnSuccess")
-            embed.description = msg
+            embed = EmbedHelper.success(msg)
             return [ExecResp(code=6, args=embed)]
 
         return None
