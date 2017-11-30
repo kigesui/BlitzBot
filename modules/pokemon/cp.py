@@ -1,14 +1,16 @@
 from ..i_module import IModule, ExecResp
-from utils.bot_logger import BotLogger
+# from utils.bot_logger import BotLogger
 from utils.bot_config import BotConfig
+from utils.bot_embed_helper import EmbedHelper
 import math
 import re
+
 from discord import Embed
 
 
 class CpModule(IModule):
 
-    __POKEMON_REGEX = "[\.a-zA-Z\']+"
+    __POKEMON_REGEX = "[\.a-zA-Z\'\-]+"
 
     __CP_MULTIPLIER = [
         0.094, 0.16639787, 0.21573247, 0.25572005, 0.29024988,
@@ -74,17 +76,15 @@ class CpModule(IModule):
         if command == "cp":
             # BotLogger().debug("CP")
             if not re.match("^cp {}$".format(self.__POKEMON_REGEX), cmd):
-                embed = Embed()
-                embed.colour = BotConfig().get_hex("Colors", "OnError")
-                embed.description = "Usage: {}cp pokemon_name".format(
-                                    BotConfig().get_botprefix())
+                usage_msg = "Usage: {}cp pokemon_name".format(
+                            BotConfig().get_botprefix())
+                embed = EmbedHelper.error(usage_msg)
                 return [ExecResp(code=500, args=embed)]
 
             pokemon = cmd_args[1].lower()
             if pokemon not in self.__pokemon_stats:
-                embed = Embed()
-                embed.colour = BotConfig().get_hex("Colors", "OnError")
-                embed.description = "{} is not a pokemon".format(cmd_args[1])
+                msg = "{} is not a pokemon".format(cmd_args[1])
+                embed = EmbedHelper.error(msg)
                 return [ExecResp(code=500, args=embed)]
 
             cps = self._compute_cps(pokemon)
