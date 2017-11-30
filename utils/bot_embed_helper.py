@@ -6,22 +6,25 @@ from utils.bot_config import BotConfig
 class EmbedHelper:
 
     @staticmethod
-    def error(msg):
+    def error(msg=None):
         embed = Embed()
         embed.colour = BotConfig().get_hex("Colors", "OnError")
-        embed.description = msg
+        if msg:
+            embed.description = msg
         return embed
 
     @staticmethod
-    def success(msg):
+    def success(msg=None):
         embed = Embed()
         embed.colour = BotConfig().get_hex("Colors", "OnSuccess")
-        embed.description = msg
+        if msg:
+            embed.description = msg
         return embed
 
     @staticmethod
-    def warning(msg):
+    def warning(msg=None):
         embed = Embed()
         embed.colour = BotConfig().get_hex("Colors", "OnWarning")
-        embed.description = msg
+        if msg:
+            embed.description = msg
         return embed

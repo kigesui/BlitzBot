@@ -2,9 +2,8 @@ from ..i_module import IModule, ExecResp
 from utils.bot_logger import BotLogger
 from utils.bot_config import BotConfig
 from utils.bot_db import BotDB
+from utils.bot_embed_helper import EmbedHelper
 from utils.utils import get_servername
-
-from discord import Embed
 
 
 class HallPoop(IModule):
@@ -87,21 +86,19 @@ class HallPoop(IModule):
         if cmd_args[0] == "lbp" or cmd_args[0] == "leaderboardpoop":
             # check args
             if len(cmd_args) != 1:
-                embed = Embed()
-                embed.colour = BotConfig().get_hex("Colors", "OnError")
                 prefix = BotConfig().get_botprefix()
-                embed.description = "Usage: {}leaderboardpoop or {}lbp".format(
-                                    prefix, prefix)
+                msg = "Usage: {}leaderboardpoop or {}lbp".format(
+                      prefix, prefix)
+                embed = EmbedHelper.error(msg)
                 return [ExecResp(code=500, args=embed)]
 
             # refresh table
             self.__load_table()
 
             # create embed
-            embed = Embed()
-            embed.colour = BotConfig().get_hex("Colors", "OnSuccess")
-            embed.title = "{} Hall of Poop {}".format(self.__emoji,
-                                                      self.__emoji)
+            embed = EmbedHelper.success()
+            embed.title = "{} Hall of Poop {}".format(
+                          self.__emoji, self.__emoji)
             # add each person poop
             sorted_poop = [(k, self.__hall_poop[k])
                            for k in sorted(
@@ -131,12 +128,10 @@ class HallPoop(IModule):
             if not (len(cmd_args) == 1 or
                     (len(cmd_args) == 2 and
                      len(exec_args.rqt_msg.mentions) == 1)):
-                embed = Embed()
-                embed.colour = BotConfig().get_hex("Colors", "OnError")
                 prefix = BotConfig().get_botprefix()
-                embed.description = \
-                    "Usage: {}showpoop or {}showpoop @someone".format(
-                        prefix, prefix)
+                msg = "Usage: {}showpoop or {}showpoop @someone".format(
+                      prefix, prefix)
+                embed = EmbedHelper.error(msg)
                 return [ExecResp(code=500, args=embed)]
 
             # refresh table
@@ -154,10 +149,9 @@ class HallPoop(IModule):
                 amount = 0
 
             # create embed
-            embed = Embed()
-            embed.colour = BotConfig().get_hex("Colors", "OnSuccess")
-            embed.description = "{} holds {} {}".format(
-                                tgt_usr.mention, amount, self.__emoji)
+            msg = "{} holds {} {}".format(
+                  tgt_usr.mention, amount, self.__emoji)
+            embed = EmbedHelper.success(msg)
             return [ExecResp(code=200, args=embed)]
 
         # """
@@ -169,10 +163,9 @@ class HallPoop(IModule):
             # BotLogger().debug(exec_args.rqt_msg.mentions)
             if not (len(cmd_args) == 2 and
                     len(exec_args.rqt_msg.mentions) == 1):
-                embed = Embed()
-                embed.colour = BotConfig().get_hex("Colors", "OnError")
-                embed.description = "Usage: {}throwpoop @someone".format(
-                                    BotConfig().get_botprefix() )
+                msg = "Usage: {}throwpoop @someone".format(
+                      BotConfig().get_botprefix() )
+                embed = EmbedHelper.error(msg)
                 return [ExecResp(code=500, args=embed)]
 
             src_usr = exec_args.rqt_msg.author
@@ -189,11 +182,10 @@ class HallPoop(IModule):
             src_usr_nick = get_servername(exec_args.rqt_msg.server, src_usr.id)
 
             # create response
-            embed = Embed()
-            embed.colour = BotConfig().get_hex("Colors", "OnSuccess")
-            embed.description = "**{}** throw {} {} at {}.".format(
-                                src_usr_nick, amount, self.__emoji,
-                                tgt_usr.mention)
+            msg = "**{}** throw {} {} at {}.".format(
+                  src_usr_nick, amount, self.__emoji,
+                  tgt_usr.mention)
+            embed = EmbedHelper.success(msg)
             return [ExecResp(code=200, args=embed)]
 
         # """
@@ -205,10 +197,9 @@ class HallPoop(IModule):
             if (len(cmd_args) != 3 or
                len(exec_args.rqt_msg.mentions) == 0 or
                not cmd_args[1].isdecimal()):
-                embed = Embed()
-                embed.colour = BotConfig().get_hex("Colors", "OnError")
-                embed.description = "Usage: {}clean 1 @someone".format(
-                                    BotConfig().get_botprefix() )
+                msg = "Usage: {}clean 1 @someone".format(
+                      BotConfig().get_botprefix() )
+                embed = EmbedHelper.error(msg)
                 return [ExecResp(code=500, args=embed)]
 
             # check bot owner
@@ -230,11 +221,10 @@ class HallPoop(IModule):
             src_usr_nick = get_servername(exec_args.rqt_msg.server, src_usr.id)
 
             # create response
-            embed = Embed()
-            embed.colour = BotConfig().get_hex("Colors", "OnSuccess")
-            embed.description = "**{}** took {} {} from {}.".format(
-                                src_usr_nick, amount, self.__emoji,
-                                tgt_usr.mention)
+            msg = "**{}** took {} {} from {}.".format(
+                  src_usr_nick, amount, self.__emoji,
+                  tgt_usr.mention)
+            embed = EmbedHelper.success(msg)
             return [ExecResp(code=200, args=embed)]
 
         return None
