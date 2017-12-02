@@ -49,8 +49,9 @@ class MinesweeperModule(IModule):
                 embed = EmbedHelper.error(msg)
                 return [ExecResp(code=500, args=embed)]
 
-            embed = EmbedHelper.warning("todo: flag")
-            return [ExecResp(code=200, args=embed)]
+            x = "A"
+            y = "1"
+            return self.flag(x, y)
 
         if command == "msd":
             if not re.match("^msd$", cmd):
@@ -58,7 +59,7 @@ class MinesweeperModule(IModule):
                       BotConfig().get_botprefix())
                 embed = EmbedHelper.error(msg)
                 return [ExecResp(code=500, args=embed)]
-            return self.display_board(cmd)
+            return self.display_board()
 
         elif command == "mss":
             if not re.match("^mss$", cmd):
@@ -66,13 +67,13 @@ class MinesweeperModule(IModule):
                       BotConfig().get_botprefix())
                 embed = EmbedHelper.error(msg)
                 return [ExecResp(code=500, args=embed)]
-            return self.stop_game(cmd)
+            return self.stop_game()
 
         return None
     # end of execute
 
     # decorator to check if game is running or not
-    def game_running(want_run):
+    def game_running(want_run=True):
         def game_running_decorator(func):
             def func_warpper(self, *arg, **kw):
                 if want_run and not self.__board:
@@ -87,20 +88,59 @@ class MinesweeperModule(IModule):
             return func_warpper
         return game_running_decorator
 
+    # decorator to display board
+    def add_display(func):
+        def func_warpper(self, *arg, **kw):
+            func_list = func(self, *arg, **kw)
+            board = self.display_board()
+            return func_list + board
+        return func_warpper
+
+    # decorator to check if win or lose
+    def check_win_lose(func):
+        def func_warpper(self, *arg, **kw):
+            ret_list = func(self, *arg, **kw)
+            if self.__board.game_won():
+                pass
+            return ret_list
+        return func_warpper
+
+    # all functions below are called after parsing
     @game_running(False)
+    @add_display()
     def start_game(self, w, h, m):
         self.__board = Board()
         self.__board.init(w, h, m)
         embed = EmbedHelper.success("Minesweeper Start!")
         return [ExecResp(code=200, args=embed)]
 
-    @game_running(True)
-    def stop_game(self, cmd):
+    @game_running()
+    @add_display()
+    def stop_game(self):
         self.__board = None
         embed = EmbedHelper.success("Minesweeper Stopped.")
         return [ExecResp(code=200, args=embed)]
 
-    @game_running(True)
-    def display_board(self, cmd):
+    @game_running()
+    def display_board(self):
         embed = EmbedHelper.success( "```" + str(self.__board) + "```")
+        return [ExecResp(code=200, args=embed)]
+
+    @game_running()
+    @add_display()
+    def flag(self, x, y):
+        if self.__board.flag(x, y):
+            embed = EmbedHelper.success("Flagged {0}{1}".format(x, y))
+        else:
+            embed = EmbedHelper.warning("Couldn't flag {0}{1}".format(x, y))
+        return [ExecResp(code=200, args=embed)]
+
+    @game_running
+    @check_win_lose
+    @add_display
+    def reveal(self, x, y):
+        if self.__board.reveal(x, y):
+            embed = EmbedHelper.success("Revealed {0}{1}".format(x, y))
+        else:
+            embed = EmbedHelper.warning("Couldn't reveal {0}{1}".format(x, y))
         return [ExecResp(code=200, args=embed)]
