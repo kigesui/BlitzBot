@@ -138,7 +138,8 @@ class MinesweeperModule(IModule):
         if self.__board.flag(x, y):
             embed = EmbedHelper.success("Flagged {0}{1}".format(x, y))
         else:
-            embed = EmbedHelper.warning("Can't flag {0}{1}".format(x, y))
+            embed = EmbedHelper.warning("{0}{1} is revealed or invalid"
+                                        .format(x, y))
         return [ExecResp(code=200, args=embed)]
 
     @game_running()
@@ -148,5 +149,6 @@ class MinesweeperModule(IModule):
         if self.__board.reveal(x, y):
             embed = EmbedHelper.success("Revealed {0}{1}".format(x, y))
         else:
-            embed = EmbedHelper.warning("{0}{1} already revealed".format(x, y))
+            embed = EmbedHelper.warning("{0}{1} already revealed or invalid"
+                                        .format(x, y))
         return [ExecResp(code=200, args=embed)]
