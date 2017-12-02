@@ -225,10 +225,18 @@ class TestMinesweeperLogic(unittest.TestCase):
         # 4|                     |
 
         board = Board()
-        board.init(7, 4, 1, 0)
+        board.init(7, 4, 1, 1)
         board.cells = [board.UNREVEALED] * 28
-        board.mines[0].x = 3
-        board.mines[0].y = 1
+        board.mines = []
+        board.mines.append(Mine(3, 1))
+
+        # for i in range(28):
+        #     x = board._i2x(i)
+        #     y = board._i2y(i)
+        #     self.assertEqual(board.reveal(x, y), True)
+        # print(board.num_mines)
+        # print(str(board))
+        # return
 
         for i in [1, 3, 8, 9, 10]:
             x = board._i2x(i)
@@ -285,7 +293,7 @@ class TestMinesweeperLogic(unittest.TestCase):
     def test_reveal1234567(self):
         #  | A  B  C  D  E  F  G |
         # 1| *  *  *  *  4  2  1 |
-        # 2| *  6  5  *  *  *  2 |
+        # 2| *  6  6  *  *  *  2 |
         # 3| *  *  4  *  7  *  3 |
         # 4| 2  2  3  *  4  *  2 |
 
@@ -296,7 +304,7 @@ class TestMinesweeperLogic(unittest.TestCase):
         # 4|21 22 23 24 25 26 27
 
         board = Board()
-        board.init(7, 4, 2, 0)
+        board.init(7, 4, 0, 0)
         board.cells = [board.UNREVEALED] * 28
 
         mines = set([0, 1, 2, 3, 7, 10, 11, 12,
@@ -308,14 +316,21 @@ class TestMinesweeperLogic(unittest.TestCase):
             2: set([5, 13, 21, 22, 27]),
             3: set([20, 23]),
             4: set([4, 16, 25]),
-            5: set([9]),
-            6: set([8]),
+            5: set([]),
+            6: set([8, 9]),
             7: set([18])
         }
 
         for i in mines:
             mine = Mine(board._i2x(i), board._i2y(i))
             board.mines.append(mine)
+
+        # for i in range(28):
+        #     x = board._i2x(i)
+        #     y = board._i2y(i)
+        #     self.assertEqual(board.reveal(x, y), True)
+        # print(str(board))
+        # return
 
         for number in number_cells.keys():
             for i in number_cells[number]:
@@ -350,7 +365,7 @@ class TestMinesweeperLogic(unittest.TestCase):
         # 4|21 22 23 24 25 26 27
 
         board = Board()
-        board.init(7, 4, 2, 0)
+        board.init(7, 4, 0, 0)
         board.cells = [board.UNREVEALED] * 28
 
         mines = set([0, 1, 2, 3, 4, 5, 7, 9,
@@ -371,6 +386,13 @@ class TestMinesweeperLogic(unittest.TestCase):
         for i in mines:
             mine = Mine(board._i2x(i), board._i2y(i))
             board.mines.append(mine)
+
+        # for i in range(28):
+        #     x = board._i2x(i)
+        #     y = board._i2y(i)
+        #     self.assertEqual(board.reveal(x, y), True)
+        # print(str(board))
+        # return
 
         for number in number_cells.keys():
             for i in number_cells[number]:
@@ -405,7 +427,7 @@ class TestMinesweeperLogic(unittest.TestCase):
         # 4|21 22 23 24 25 26 27
 
         board = Board()
-        board.init(7, 4, 2, 0)
+        board.init(7, 4, 0, 0)
         board.cells = [board.UNREVEALED] * 28
 
         mines = set([16, 17])
@@ -449,7 +471,7 @@ class TestMinesweeperLogic(unittest.TestCase):
         # 4|                     |
 
         board = Board()
-        board.init(7, 4, 2, 0)
+        board.init(7, 4, 0, 0)
         board.cells = [board.UNREVEALED] * 28
 
         mines = set([2, 3])
@@ -501,7 +523,7 @@ class TestMinesweeperLogic(unittest.TestCase):
 
     def test_reveal_flag(self):
         board = Board()
-        board.init(7, 4, 2, 0)
+        board.init(7, 4, 0, 0)
         board.cells = [board.FLAG] * 28
         for i in range(28):
             x = board._i2x(i)
@@ -510,7 +532,7 @@ class TestMinesweeperLogic(unittest.TestCase):
 
     def test_reveal_flag_boundaries(self):
         board = Board()
-        board.init(7, 4, 2, 0)
+        board.init(7, 4, 0, 0)
         board.cells = [board.UNREVEALED] * 28
         self.assertEqual(board.reveal(0, 1), False)
         self.assertEqual(board.reveal(8, 1), False)
@@ -520,8 +542,6 @@ class TestMinesweeperLogic(unittest.TestCase):
         self.assertEqual(board.flag(8, 1), False)
         self.assertEqual(board.flag(1, 0), False)
         self.assertEqual(board.flag(1, 5), False)
-
-
 
     # def test_system1(self):
     #     pass
