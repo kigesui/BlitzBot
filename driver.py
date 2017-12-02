@@ -80,8 +80,11 @@ def main():
         if request.content[0] != BOT_PREFIX:
             return
 
+        # sanitize input
+        sanitized_content = re.sub("\s+", " ", request.content)
+
         # drop ignored stuff
-        if ignore_content(request.content):
+        if ignore_content(sanitized_content):
             return
 
         BotLogger().info("----------")
@@ -91,7 +94,7 @@ def main():
         BotLogger().info("Content: {}".format(request.content))
 
         # prepare execute function
-        command = request.content[1:]
+        command = sanitized_content[1:]
 
         is_success = False
         for module in CMD_MODULES:
