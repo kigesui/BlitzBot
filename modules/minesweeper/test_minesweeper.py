@@ -3,6 +3,7 @@
 import unittest
 
 from modules.minesweeper.minesweeper_logic import Board
+from modules.minesweeper.minesweeper_logic import Mine
 
 
 class TestMinesweeperCommands(unittest.TestCase):
@@ -59,7 +60,7 @@ class TestMinesweeperLogic(unittest.TestCase):
         board = Board()
         board.init(7, 4, 1, 0)
         # shouldnt win: nothing revealed
-        self.assertEqual(board._game_won(), False)
+        self.assertEqual(board.game_won(), False)
         return
 
     def test_win2(self):
@@ -85,7 +86,7 @@ class TestMinesweeperLogic(unittest.TestCase):
         # print(str(board))
 
         # should win: blank is mine
-        self.assertEqual(board._game_won(), True)
+        self.assertEqual(board.game_won(), True)
         return
 
     def test_win3(self):
@@ -118,7 +119,7 @@ class TestMinesweeperLogic(unittest.TestCase):
         # print("\n"+str(board))
 
         # game is won: flagged or blank are mines
-        self.assertEqual(board._game_won(), True)
+        self.assertEqual(board.game_won(), True)
         return
 
     def test_win4(self):
@@ -144,13 +145,13 @@ class TestMinesweeperLogic(unittest.TestCase):
         # print(str(board))
 
         # shouldnt win: not all revealed
-        self.assertEqual(board._game_won(), False)
+        self.assertEqual(board.game_won(), False)
         return
 
     def test_lose1(self):
         board = Board()
         board.init(7, 4, 1, 0)
-        self.assertEqual(board._game_lose(), False)
+        self.assertEqual(board.game_lose(), False)
         return
 
     def test_lose2(self):
@@ -172,7 +173,7 @@ class TestMinesweeperLogic(unittest.TestCase):
         board.cells[9] = board.REVEALED[1]
         board.cells[10] = board.REVEALED[1]
         # no mines are revealed
-        self.assertEqual(board._game_lose(), False)
+        self.assertEqual(board.game_lose(), False)
         return
 
     def test_lose3(self):
@@ -195,7 +196,7 @@ class TestMinesweeperLogic(unittest.TestCase):
         board.cells[9] = board.REVEALED[1]
         board.cells[10] = board.REVEALED[1]
         # one mine is revealed
-        self.assertEqual(board._game_lose(), True)
+        self.assertEqual(board.game_lose(), True)
         return
 
     def test_reveal1(self):
@@ -280,25 +281,23 @@ class TestMinesweeperLogic(unittest.TestCase):
         board.init(7, 4, 2, 0)
         board.cells = [board.UNREVEALED] * 28
 
-        mines = set(0, 1, 2, 3, 7, 10, 11, 12,
-                    14, 15, 17, 19, 24, 26)
+        mines = set([0, 1, 2, 3, 7, 10, 11, 12,
+                    14, 15, 17, 19, 24, 26])
 
         number_cells = {
-            0: set(),
-            1: set(6),
-            2: set(5, 13, 21, 22, 27),
-            3: set(20, 23),
-            4: set(4, 16, 25),
-            5: set(9),
-            6: set(8),
-            7: set(18)
+            0: set([]),
+            1: set([6]),
+            2: set([5, 13, 21, 22, 27]),
+            3: set([20, 23]),
+            4: set([4, 16, 25]),
+            5: set([9]),
+            6: set([8]),
+            7: set([18])
         }
 
-        mines_i = 0
         for i in mines:
-            board.mines[mines_i].x = board._i2x(i)
-            board.mines[mines_i].y = board._i2y(i)
-            mines_i += 1
+            mine = Mine(board._i2x(i), board._i2y(i))
+            board.mines.append(mine)
 
         for number in number_cells.keys():
             for i in number_cells[number]:
@@ -336,26 +335,24 @@ class TestMinesweeperLogic(unittest.TestCase):
         board.init(7, 4, 2, 0)
         board.cells = [board.UNREVEALED] * 28
 
-        mines = set(0, 1, 2, 3, 4, 5, 7, 9,
-                    14, 15, 16, 17, 18, 19, 20, 25)
+        mines = set([0, 1, 2, 3, 4, 5, 7, 9,
+                    14, 15, 16, 17, 18, 19, 20, 25])
 
         number_cells = {
-            0: set(),
-            1: set(6),
-            2: set(21, 27),
-            3: set(13, 22, 23),
-            4: set(24, 26),
-            5: set(12),
-            6: set(11),
-            7: set(10),
-            8: set(8)
+            0: set([]),
+            1: set([6]),
+            2: set([21, 27]),
+            3: set([13, 22, 23]),
+            4: set([24, 26]),
+            5: set([12]),
+            6: set([11]),
+            7: set([10]),
+            8: set([8])
         }
 
-        mines_i = 0
         for i in mines:
-            board.mines[mines_i].x = board._i2x(i)
-            board.mines[mines_i].y = board._i2y(i)
-            mines_i += 1
+            mine = Mine(board._i2x(i), board._i2y(i))
+            board.mines.append(mine)
 
         for number in number_cells.keys():
             for i in number_cells[number]:
@@ -393,21 +390,19 @@ class TestMinesweeperLogic(unittest.TestCase):
         board.init(7, 4, 2, 0)
         board.cells = [board.UNREVEALED] * 28
 
-        mines = set(16, 17)
+        mines = set([16, 17])
 
         number_cells = {
-            0: set(0, 1, 2, 3, 4, 5, 6,
+            0: set([0, 1, 2, 3, 4, 5, 6,
                    7, 12, 13, 14, 19, 20,
-                   21, 26, 27),
-            1: set(8, 15, 22, 11, 18, 25),
-            2: set(9, 10)
+                   21, 26, 27]),
+            1: set([8, 15, 22, 11, 18, 25]),
+            2: set([9, 10])
         }
 
-        mines_i = 0
         for i in mines:
-            board.mines[mines_i].x = board._i2x(i)
-            board.mines[mines_i].y = board._i2y(i)
-            mines_i += 1
+            mine = Mine(board._i2x(i), board._i2y(i))
+            board.mines.append(mine)
 
         i = 0
         x = board._i2x(i)
@@ -439,28 +434,26 @@ class TestMinesweeperLogic(unittest.TestCase):
         board.init(7, 4, 2, 0)
         board.cells = [board.UNREVEALED] * 28
 
-        mines = set(2, 3)
+        mines = set([2, 3])
 
         number_cells = {
-            0: set(0, 5, 6,
+            0: set([0, 5, 6,
                    7, 12, 13,
                    14, 15, 16, 17, 18, 19, 20,
-                   21, 22, 23, 24, 25, 26, 27),
-            1: set(1, 4, 8, 11),
-            2: set(9, 10),
-            3: set(),
-            4: set(),
-            5: set(),
-            6: set(),
-            7: set(),
-            8: set()
+                   21, 22, 23, 24, 25, 26, 27]),
+            1: set([1, 4, 8, 11]),
+            2: set([9, 10]),
+            3: set([]),
+            4: set([]),
+            5: set([]),
+            6: set([]),
+            7: set([]),
+            8: set([])
         }
 
-        mines_i = 0
         for i in mines:
-            board.mines[mines_i].x = board._i2x(i)
-            board.mines[mines_i].y = board._i2y(i)
-            mines_i += 1
+            mine = Mine(board._i2x(i), board._i2y(i))
+            board.mines.append(mine)
 
         # toggle flagging on mines
         for i in mines:
@@ -488,8 +481,17 @@ class TestMinesweeperLogic(unittest.TestCase):
 
         return
 
-    def test_system1(self):
-        pass
+    def test_reveal_flag(self):
+        board = Board()
+        board.init(7, 4, 2, 0)
+        board.cells = [board.FLAG] * 28
+        for i in range(28):
+            x = board._i2x(i)
+            y = board._i2y(i)
+            self.assertEqual(board.reveal(x, y), False)
+
+    # def test_system1(self):
+    #     pass
 
 
 if __name__ == '__main__':

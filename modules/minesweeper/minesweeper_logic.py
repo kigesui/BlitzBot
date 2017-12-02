@@ -96,12 +96,19 @@ class Board:
                 return True
         return False
 
+    # flag
+    # returns false if number or mine
+    def flag(self, x, y):
+        i = self._xy2i(x, y)
+        if self.cells[i] == self.UNREVEALED:
+            self.cells[i] = self.FLAG
+            return True
+        if self.cells[i] == self.FLAG:
+            self.cells[i] = self.UNREVEALED
+            return True
+        return False
+
     # reveal
     # returns false if already revealed or invalid
     def reveal(self, x, y):
-        return False
-
-    # flag
-    # returns false if fail
-    def flag(self, x, y):
         return False
