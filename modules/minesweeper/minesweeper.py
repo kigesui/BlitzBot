@@ -1,6 +1,7 @@
 from ..i_module import IModule, ExecResp
 from utils.bot_config import BotConfig
 from utils.bot_embed_helper import EmbedHelper
+# from utils.bot_logger import BotLogger
 from modules.minesweeper.minesweeper_logic import Board
 # import random
 import re
@@ -18,7 +19,7 @@ class MinesweeperModule(IModule):
 
         # start new game
         if command == "ms":
-            if not re.match("^ms [0-9]+ [0-9]+ [0-9]+$", cmd):
+            if not re.match("^ms\s+[0-9]+\s+[0-9]+\s+[0-9]+$", cmd):
                 embed = EmbedHelper.error(
                     "Usage: {}ms width heigth mines".format(
                         BotConfig().get_botprefix()))
@@ -38,8 +39,9 @@ class MinesweeperModule(IModule):
                 embed = EmbedHelper.error(msg)
                 return [ExecResp(code=500, args=embed)]
 
-            embed = EmbedHelper.warning("todo: reveal")
-            return [ExecResp(code=200, args=embed)]
+            x = "A"
+            y = "1"
+            return self.reveal(x, y)
 
         # flag
         if command == "msf":
@@ -99,15 +101,19 @@ class MinesweeperModule(IModule):
     # decorator to check if win or lose
     def check_win_lose(func):
         def func_warpper(self, *arg, **kw):
+            # BotLogger().info("checked")
             ret_list = func(self, *arg, **kw)
+            if self.__board.game_lose():
+                embed = EmbedHelper.success("Game Over! Try Again.")
             if self.__board.game_won():
-                pass
+                embed = EmbedHelper.success("Congratulation! You Won.")
+            ret_list.append(ExecResp(code=200, args=embed))
             return ret_list
         return func_warpper
 
     # all functions below are called after parsing
     @game_running(False)
-    @add_display()
+    @add_display
     def start_game(self, w, h, m):
         self.__board = Board()
         self.__board.init(w, h, m)
@@ -115,7 +121,7 @@ class MinesweeperModule(IModule):
         return [ExecResp(code=200, args=embed)]
 
     @game_running()
-    @add_display()
+    @add_display
     def stop_game(self):
         self.__board = None
         embed = EmbedHelper.success("Minesweeper Stopped.")
@@ -127,20 +133,20 @@ class MinesweeperModule(IModule):
         return [ExecResp(code=200, args=embed)]
 
     @game_running()
-    @add_display()
+    @add_display
     def flag(self, x, y):
         if self.__board.flag(x, y):
             embed = EmbedHelper.success("Flagged {0}{1}".format(x, y))
         else:
-            embed = EmbedHelper.warning("Couldn't flag {0}{1}".format(x, y))
+            embed = EmbedHelper.warning("Can't flag {0}{1}".format(x, y))
         return [ExecResp(code=200, args=embed)]
 
-    @game_running
+    @game_running()
     @check_win_lose
     @add_display
     def reveal(self, x, y):
         if self.__board.reveal(x, y):
             embed = EmbedHelper.success("Revealed {0}{1}".format(x, y))
         else:
-            embed = EmbedHelper.warning("Couldn't reveal {0}{1}".format(x, y))
+            embed = EmbedHelper.warning("{0}{1} already revealed".format(x, y))
         return [ExecResp(code=200, args=embed)]
