@@ -37,7 +37,9 @@ class Board:
 
     # print
     def __str__(self):
-        board_str = "__|"
+        num_flag = self.cells.count(self.FLAG)
+        board_str = "Mines Remaining:{}\n".format(self.num_mines-num_flag)
+        board_str += "__|"
         # print col header
         for i in range(self.width):
             board_str += "{:_>2}".format(chr(0x40+i+1))
