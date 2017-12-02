@@ -30,7 +30,7 @@ class Board:
         return i % self.width + 1
 
     def _i2y(self, i):
-        return i / self.width + 1
+        return int(i / self.width) + 1
 
     def _xy2i(self, x, y):
         return (y-1)*self.width+(x-1)
