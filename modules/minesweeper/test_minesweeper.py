@@ -56,6 +56,24 @@ class TestMinesweeperLogic(unittest.TestCase):
         self.assertEqual(board._xy2i(2, 3), 15)
         self.assertEqual(board._xy2i(7, 4), 27)
 
+    def test_init(self):
+        board = Board()
+        board.init(7, 4, 3, 0)
+        self.assertEqual(board.width, 7)
+        self.assertEqual(board.height, 4)
+        self.assertEqual(len(board.mines), 3)
+        self.assertEqual(len(board.cells), 28)
+        return
+
+    def test_init0(self):
+        board = Board()
+        board.init(7, 4, 0, 0)
+        self.assertEqual(board.width, 7)
+        self.assertEqual(board.height, 4)
+        self.assertEqual(len(board.mines), 0)
+        self.assertEqual(len(board.cells), 28)
+        return
+
     def test_win1(self):
         board = Board()
         board.init(7, 4, 1, 0)
