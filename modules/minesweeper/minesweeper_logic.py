@@ -96,8 +96,19 @@ class Board:
                 return True
         return False
 
+    # checks if x and y are valid
+    def check_xy(func):
+        def func_warpper(self, x, y):
+            if x < 1 or x > self.width:
+                return False
+            if y < 1 or y > self.height:
+                return False
+            return func(self, x, y)
+        return func_warpper
+
     # flag
     # returns false if number or mine
+    @check_xy
     def flag(self, x, y):
         i = self._xy2i(x, y)
         if self.cells[i] == self.UNREVEALED:
@@ -110,5 +121,9 @@ class Board:
 
     # reveal
     # returns false if already revealed or invalid
+    @check_xy
     def reveal(self, x, y):
+        i = self._xy2i(x, y)
+        if self.cells[i] == self.UNREVEALED:
+            return True
         return False

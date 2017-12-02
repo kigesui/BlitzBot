@@ -490,6 +490,21 @@ class TestMinesweeperLogic(unittest.TestCase):
             y = board._i2y(i)
             self.assertEqual(board.reveal(x, y), False)
 
+    def test_reveal_flag_boundaries(self):
+        board = Board()
+        board.init(7, 4, 2, 0)
+        board.cells = [board.UNREVEALED] * 28
+        self.assertEqual(board.reveal(0, 1), False)
+        self.assertEqual(board.reveal(8, 1), False)
+        self.assertEqual(board.reveal(1, 0), False)
+        self.assertEqual(board.reveal(1, 5), False)
+        self.assertEqual(board.flag(0, 1), False)
+        self.assertEqual(board.flag(8, 1), False)
+        self.assertEqual(board.flag(1, 0), False)
+        self.assertEqual(board.flag(1, 5), False)
+
+
+
     # def test_system1(self):
     #     pass
 
