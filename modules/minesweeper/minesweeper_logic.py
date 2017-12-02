@@ -79,14 +79,25 @@ class Board:
 
     # game won
     def game_won(self):
-        return False
+        # if num_reveal + num_mines == total
+        total = len(self.cells)
+        num_reveal = 0
+        for c in self.cells:
+            if c in self.REVEALED:
+                num_reveal += 1
+        return num_reveal + self.num_mines == total
 
     # game lose
     def game_lose(self):
+        # if a mine is revealed
+        for m in self.mines:
+            i = self._xy2i(m.x, m.y)
+            if self.cells[i] == self.MINE:
+                return True
         return False
 
     # reveal
-    # returns false if fail
+    # returns false if already revealed or invalid
     def reveal(self, x, y):
         return False
 
@@ -94,4 +105,3 @@ class Board:
     # returns false if fail
     def flag(self, x, y):
         return False
-
