@@ -166,6 +166,21 @@ class TestMinesweeperLogic(unittest.TestCase):
         self.assertEqual(board.game_won(), False)
         return
 
+    def test_win5(self):
+        #  | A |
+        # 1| * |
+        board = Board()
+        board.init(1, 1, 1, 0)
+        board.cells = [board.UNREVEALED]
+        board.mines[0].x = 1
+        board.mines[0].y = 1
+
+        board.cells[0] = board.MINE
+
+        # shouldnt win
+        self.assertEqual(board.game_won(), False)
+        return
+
     def test_lose1(self):
         board = Board()
         board.init(7, 4, 1, 0)
