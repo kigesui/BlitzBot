@@ -2,6 +2,8 @@ from ..i_module import IModule, ExecResp
 # from utils.bot_logger import BotLogger
 from utils.bot_config import BotConfig
 from utils.bot_embed_helper import EmbedHelper
+import re
+import time
 
 from discord import Emoji
 
@@ -30,6 +32,21 @@ class PingModule(IModule):
 
         if command == "ping2":
             msg = "Pong! {}".format(self.emoji)
+            embed = EmbedHelper.success(msg)
+            return [ExecResp(code=200, args=embed)]
+
+        if command == "timer":
+            if not re.match("^timer [0-9]+$", cmd):
+                prefix = BotConfig.get_botprefix()
+                msg = "Usage: {}timer 3".format(prefix)
+                embed = EmbedHelper.error(msg)
+                return [ExecResp(code=500, args=embed)]
+            # msg = "{} has set a timer.".format(exec_args.rqt_msg.author)
+            # embed = EmbedHelper.success(msg)
+            # channel = exec_args.rqt_msg.channel
+            # exec_args.client.send_message(channel, embed=embed)
+            time.sleep(int(cmd_args[1]))
+            msg = "Wake up! {}".format(exec_args.rqt_msg.author.mention)
             embed = EmbedHelper.success(msg)
             return [ExecResp(code=200, args=embed)]
 
