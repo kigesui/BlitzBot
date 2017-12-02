@@ -17,12 +17,11 @@ class Board:
     FLAG = 'F'
     MINE = '*'
 
-    width = 0
-    height = 0
-    cells = []  # list of chars
-    mines = []  # list of Mines
-
     def __init__(self):
+        self.width = 0
+        self.height = 0
+        self.cells = []  # list of chars
+        self.mines = []  # list of Mines
         return
 
     # conversion functions
@@ -38,7 +37,7 @@ class Board:
     # print
     def __str__(self):
         num_flag = self.cells.count(self.FLAG)
-        board_str = "Mines Remaining:{}\n".format(self.num_mines-num_flag)
+        board_str = "Mines Remaining:{}\n".format(len(self.mines)-num_flag)
         board_str += "__|"
         # print col header
         for i in range(self.width):
@@ -59,22 +58,19 @@ class Board:
     def init(self, w, h, num_mines, seed=0):
         self.width = w
         self.height = h
-        self.num_mines = num_mines
         num_cells = self.height * self.width
         self.cells = [self.UNREVEALED] * num_cells
-
-        if seed != 0:
-            rand.seed(seed)
+        self.mines = []
 
         # place mines
+        if seed != 0:
+            rand.seed(seed)
         possible_spaces = set(range(num_cells))
-        mines_places = rand.sample(possible_spaces, self.num_mines)
-
+        mines_places = rand.sample(possible_spaces, num_mines)
         for i in mines_places:
             x = self._i2x(i)
             y = self._i2y(i)
             self.mines.append(Mine(x, y))
-
         return
 
     # game won
@@ -85,7 +81,7 @@ class Board:
         for c in self.cells:
             if c in self.REVEALED:
                 num_reveal += 1
-        return num_reveal + self.num_mines == total
+        return num_reveal + len(self.mines) == total
 
     # game lose
     def game_lose(self):
@@ -125,5 +121,24 @@ class Board:
     def reveal(self, x, y):
         i = self._xy2i(x, y)
         if self.cells[i] == self.UNREVEALED:
+            num_mines = 0
+            for m in self.mines:
+                if m.x == x and m.y == y:
+                    # set mine
+                    self.cells[i] = self.MINE
+                    return True
+                if abs(m.x-x) <= 1 and abs(m.y-y) <= 1:
+                    num_mines += 1
+            # set number
+            self.cells[i] = self.REVEALED[num_mines]
+            if num_mines == 0:
+                self.reveal(x-1, y-1)
+                self.reveal(x-1, y )
+                self.reveal(x-1, y+1)
+                self.reveal(x, y-1)
+                self.reveal(x, y+1)
+                self.reveal(x+1, y-1)
+                self.reveal(x+1, y )
+                self.reveal(x+1, y+1)
             return True
         return False
