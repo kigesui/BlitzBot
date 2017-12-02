@@ -78,10 +78,13 @@ class Board:
         # if num_reveal + num_mines == total
         total = len(self.cells)
         num_reveal = 0
+        num_mines = len(self.mines)
         for c in self.cells:
             if c in self.REVEALED:
                 num_reveal += 1
-        return num_reveal + len(self.mines) == total
+        cond1 = num_reveal > 0
+        cond2 = num_reveal == (total - num_mines)
+        return cond1 and cond2
 
     # game lose
     def game_lose(self):
