@@ -39,8 +39,7 @@ class MinesweeperModule(IModule):
                 embed = EmbedHelper.error(msg)
                 return [ExecResp(code=500, args=embed)]
 
-            x = "A"
-            y = "1"
+            x, y = self.convert_input(cmd_args[1])
             return self.reveal(x, y)
 
         # flag
@@ -51,8 +50,7 @@ class MinesweeperModule(IModule):
                 embed = EmbedHelper.error(msg)
                 return [ExecResp(code=500, args=embed)]
 
-            x = "A"
-            y = "1"
+            x, y = self.convert_input(cmd_args[1])
             return self.flag(x, y)
 
         if command == "msd":
@@ -73,6 +71,12 @@ class MinesweeperModule(IModule):
 
         return None
     # end of execute
+
+    # convert input
+    def convert_input(self, user_input):
+        x = ord(user_input[0].upper()) - 0x40
+        y = int(user_input[1:])
+        return (x, y)
 
     # decorator to check if game is running or not
     def game_running(want_run=True):
@@ -105,9 +109,10 @@ class MinesweeperModule(IModule):
             ret_list = func(self, *arg, **kw)
             if self.__board.game_lose():
                 embed = EmbedHelper.success("Game Over! Try Again.")
+                ret_list.append(ExecResp(code=200, args=embed))
             if self.__board.game_won():
                 embed = EmbedHelper.success("Congratulation! You Won.")
-            ret_list.append(ExecResp(code=200, args=embed))
+                ret_list.append(ExecResp(code=200, args=embed))
             return ret_list
         return func_warpper
 
@@ -135,20 +140,22 @@ class MinesweeperModule(IModule):
     @game_running()
     @add_display
     def flag(self, x, y):
+        x_str = chr(x+0x40)
         if self.__board.flag(x, y):
-            embed = EmbedHelper.success("Flagged {0}{1}".format(x, y))
+            embed = EmbedHelper.success("Flagged {0}{1}".format(x_str, y))
         else:
             embed = EmbedHelper.warning("{0}{1} is revealed or invalid"
-                                        .format(x, y))
+                                        .format(x_str, y))
         return [ExecResp(code=200, args=embed)]
 
     @game_running()
     @check_win_lose
     @add_display
     def reveal(self, x, y):
+        x_str = chr(x+0x40)
         if self.__board.reveal(x, y):
-            embed = EmbedHelper.success("Revealed {0}{1}".format(x, y))
+            embed = EmbedHelper.success("Revealed {0}{1}".format(x_str, y))
         else:
             embed = EmbedHelper.warning("{0}{1} already revealed or invalid"
-                                        .format(x, y))
+                                        .format(x_str, y))
         return [ExecResp(code=200, args=embed)]
