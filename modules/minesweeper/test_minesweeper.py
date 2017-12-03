@@ -702,6 +702,7 @@ class TestMinesweeperLogic(unittest.TestCase):
         i = 9
         x = board._i2x(i)
         y = board._i2y(i)
+        board.cells[i] = board.REVEALED[2]
         self.assertEqual(board.expand(x, y), True)
 
         # flags should be untouched
