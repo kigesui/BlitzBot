@@ -124,17 +124,29 @@ class Board:
     def reveal(self, x, y):
         i = self._xy2i(x, y)
         if self.cells[i] == self.UNREVEALED:
-            num_mines = 0
             for m in self.mines:
                 if m.x == x and m.y == y:
                     # set mine
                     self.cells[i] = self.MINE
                     return True
-                if abs(m.x-x) <= 1 and abs(m.y-y) <= 1:
-                    num_mines += 1
             # set number
+            num_mines = self._count_mines(x, y)
             self.cells[i] = self.REVEALED[num_mines]
             if num_mines == 0:
+                self.expand(x, y)
+            return True
+        return False
+
+    # reveal
+    # returns false if cannot expand
+    @check_xy
+    def expand(self, x, y):
+        i = self._xy2i(x, y)
+        if self.cells[i] in self.REVEALED:
+            expect_num_flags = self.REVEALED.index(self.cells[i])
+            actual_num_flags = self._count_flags(x, y)
+
+            if expect_num_flags == actual_num_flags:
                 self.reveal(x-1, y-1)
                 self.reveal(x-1, y )
                 self.reveal(x-1, y+1)
@@ -143,5 +155,27 @@ class Board:
                 self.reveal(x+1, y-1)
                 self.reveal(x+1, y )
                 self.reveal(x+1, y+1)
-            return True
+                return True
         return False
+
+    def _count_mines(self, x, y):
+        num_mines = 0
+        for m in self.mines:
+            if abs(m.x-x) <= 1 and abs(m.y-y) <= 1:
+                num_mines += 1
+        return num_mines
+
+    def _count_flags(self, x, y):
+        num_flags = 0
+        scan_cells = [(x-1, y-1), (x, y-1), (x+1, y-1),
+                      (x-1, y), (x+1, y),
+                      (x-1, y+1), (x, y+1), (x+1, y+1)]
+        for fx, fy in scan_cells:
+            if fx < 0 or fx > self.width:
+                continue
+            if fy < 0 or fy > self.height:
+                continue
+            i = self._xy2i(fx, fy)
+            if self.cells[i] == self.FLAG:
+                num_flags += 1
+        return num_flags
