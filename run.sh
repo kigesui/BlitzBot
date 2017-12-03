@@ -1,6 +1,6 @@
 #!/bin/sh
 
-make init
+make init test
 
 # check log folder
 LOG_DIR='./logs'
