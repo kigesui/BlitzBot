@@ -42,6 +42,7 @@ class Board:
         # print col header
         for i in range(self.width):
             board_str += "{:_>2}".format(chr(0x40+i+1))
+        board_str += "_|"
 
         # print each row
         for y in range(self.height):
@@ -51,7 +52,7 @@ class Board:
                 x += 1
                 i = self._xy2i(x, y)
                 board_str += "{:>2}".format(self.cells[i])
-
+            board_str += " |"
         return board_str
 
     # init

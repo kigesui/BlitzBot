@@ -19,15 +19,25 @@ class MinesweeperModule(IModule):
 
         # start new game
         if command == "ms":
-            if not re.match("^ms\s+[0-9]+\s+[0-9]+\s+[0-9]+$", cmd):
+            if not re.match("^ms (beginner|intermediate)$", cmd):
                 embed = EmbedHelper.error(
-                    "Usage: {}ms width heigth mines".format(
+                    "Usage: {}ms beginner|intermediate".format(
                         BotConfig().get_botprefix()))
                 return [ExecResp(code=500, args=embed)]
 
-            w = int(cmd_args[1])
-            h = int(cmd_args[2])
-            m = int(cmd_args[3])
+            level = cmd_args[1]
+            if level == "beginner":
+                w = 8
+                h = 8
+                m = 10
+            elif level == "intermediate":
+                w = 16
+                h = 16
+                m = 40
+            else:
+                w = 1
+                h = 1
+                m = 1
 
             return self.start_game(w, h, m)
 
