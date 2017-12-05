@@ -153,7 +153,7 @@ class Board:
             expect_num_flags = self.REVEALED.index(self.cells[i])
             actual_num_flags = self._count_flags(x, y)
             if expect_num_flags == actual_num_flags:
-                for rx, ry in self.gen_scan_cells(x, y):
+                for rx, ry in self._gen_scan_cells(x, y):
                     self.reveal(rx, ry)
                 return True
         return False
@@ -167,13 +167,13 @@ class Board:
 
     def _count_flags(self, x, y):
         num_flags = 0
-        for fx, fy in self.gen_scan_cells(x, y):
+        for fx, fy in self._gen_scan_cells(x, y):
             i = self._xy2i(fx, fy)
             if self.cells[i] == self.FLAG:
                 num_flags += 1
         return num_flags
 
-    def gen_scan_cells(self, x, y):
+    def _gen_scan_cells(self, x, y):
         scan_cells = [(x-1, y-1), (x, y-1), (x+1, y-1),
                       (x-1, y), (x+1, y),
                       (x-1, y+1), (x, y+1), (x+1, y+1)]
