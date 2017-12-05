@@ -12,8 +12,8 @@ class Mine:
 
 class Board:
 
-    UNREVEALED = ' '
-    REVEALED = "012345678"
+    UNREVEALED = '?'
+    REVEALED = " 12345678"
     FLAG = 'F'
     MINE = '*'
 
@@ -42,16 +42,23 @@ class Board:
         # print col header
         for i in range(self.width):
             board_str += "{:_>2}".format(chr(0x40+i+1))
+        board_str += "_|__\n"
 
         # print each row
         for y in range(self.height):
             y += 1
-            board_str += "\n{:>2}|".format(y)
+            board_str += "{:>2}|".format(y)
             for x in range(self.width):
                 x += 1
                 i = self._xy2i(x, y)
                 board_str += "{:>2}".format(self.cells[i])
+            board_str += " |{:<2}\n".format(y)
 
+        # print col footer
+        board_str += "--|"
+        for i in range(self.width):
+            board_str += "{:->2}".format(chr(0x40+i+1))
+        board_str += "-|--"
         return board_str
 
     # init
@@ -78,10 +85,13 @@ class Board:
         # if num_reveal + num_mines == total
         total = len(self.cells)
         num_reveal = 0
+        num_mines = len(self.mines)
         for c in self.cells:
             if c in self.REVEALED:
                 num_reveal += 1
-        return num_reveal + len(self.mines) == total
+        cond1 = num_reveal > 0
+        cond2 = num_reveal == (total - num_mines)
+        return cond1 and cond2
 
     # game lose
     def game_lose(self):
@@ -121,24 +131,55 @@ class Board:
     def reveal(self, x, y):
         i = self._xy2i(x, y)
         if self.cells[i] == self.UNREVEALED:
-            num_mines = 0
             for m in self.mines:
                 if m.x == x and m.y == y:
                     # set mine
                     self.cells[i] = self.MINE
                     return True
-                if abs(m.x-x) <= 1 and abs(m.y-y) <= 1:
-                    num_mines += 1
             # set number
+            num_mines = self._count_mines(x, y)
             self.cells[i] = self.REVEALED[num_mines]
             if num_mines == 0:
-                self.reveal(x-1, y-1)
-                self.reveal(x-1, y )
-                self.reveal(x-1, y+1)
-                self.reveal(x, y-1)
-                self.reveal(x, y+1)
-                self.reveal(x+1, y-1)
-                self.reveal(x+1, y )
-                self.reveal(x+1, y+1)
+                self.expand(x, y)
             return True
         return False
+
+    # reveal
+    # returns false if cannot expand
+    @check_xy
+    def expand(self, x, y):
+        i = self._xy2i(x, y)
+        if self.cells[i] in self.REVEALED:
+            expect_num_flags = self.REVEALED.index(self.cells[i])
+            actual_num_flags = self._count_flags(x, y)
+            if expect_num_flags == actual_num_flags:
+                for rx, ry in self._gen_scan_cells(x, y):
+                    self.reveal(rx, ry)
+                return True
+        return False
+
+    def _count_mines(self, x, y):
+        num_mines = 0
+        for m in self.mines:
+            if abs(m.x-x) <= 1 and abs(m.y-y) <= 1:
+                num_mines += 1
+        return num_mines
+
+    def _count_flags(self, x, y):
+        num_flags = 0
+        for fx, fy in self._gen_scan_cells(x, y):
+            i = self._xy2i(fx, fy)
+            if self.cells[i] == self.FLAG:
+                num_flags += 1
+        return num_flags
+
+    def _gen_scan_cells(self, x, y):
+        scan_cells = [(x-1, y-1), (x, y-1), (x+1, y-1),
+                      (x-1, y), (x+1, y),
+                      (x-1, y+1), (x, y+1), (x+1, y+1)]
+        for x, y in scan_cells:
+            if x < 1 or x > self.width:
+                continue
+            if y < 1 or y > self.height:
+                continue
+            yield x, y

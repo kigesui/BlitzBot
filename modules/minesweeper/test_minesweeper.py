@@ -166,6 +166,21 @@ class TestMinesweeperLogic(unittest.TestCase):
         self.assertEqual(board.game_won(), False)
         return
 
+    def test_win5(self):
+        #  | A |
+        # 1| * |
+        board = Board()
+        board.init(1, 1, 1, 0)
+        board.cells = [board.UNREVEALED]
+        board.mines[0].x = 1
+        board.mines[0].y = 1
+
+        board.cells[0] = board.MINE
+
+        # shouldnt win
+        self.assertEqual(board.game_won(), False)
+        return
+
     def test_lose1(self):
         board = Board()
         board.init(7, 4, 1, 0)
@@ -542,6 +557,167 @@ class TestMinesweeperLogic(unittest.TestCase):
         self.assertEqual(board.flag(8, 1), False)
         self.assertEqual(board.flag(1, 0), False)
         self.assertEqual(board.flag(1, 5), False)
+
+    def test_expand1(self):
+        #  | A  B  C  D  E  F  G |
+        # 1|    1  F  x  1       |
+        # 2|    1  2  2  1       |
+        # 3|                     |
+        # 4|                     |
+
+        board = Board()
+        board.init(7, 4, 0, 0)
+        board.cells = [board.UNREVEALED] * 28
+
+        mines = set([2, 3])
+
+        number_cells = {
+            0: set([0, 5, 6,
+                   7, 12, 13,
+                   14, 15, 16, 17, 18, 19, 20,
+                   21, 22, 23, 24, 25, 26, 27]),
+            1: set([1, 4, 8, 11]),
+            2: set([9, 10]),
+            3: set([]),
+            4: set([]),
+            5: set([]),
+            6: set([]),
+            7: set([]),
+            8: set([])
+        }
+
+        for i in mines:
+            mine = Mine(board._i2x(i), board._i2y(i))
+            board.mines.append(mine)
+
+        i = 9
+        x = board._i2x(i)
+        y = board._i2y(i)
+        # expand an unrevealed = fail
+        self.assertEqual(board.expand(x, y), False)
+        board.cells[i] = board.REVEALED[2]
+        # expand an revealed but no flags = fail,,
+        self.assertEqual(board.expand(x, y), False)
+
+        # set flags
+        for i in [2, 3]:
+            x = board._i2x(i)
+            y = board._i2y(i)
+            # expand a flag
+            self.assertEqual(board.expand(x, y), False)
+            board.cells[i] = board.FLAG
+
+        # expand from one number
+        i = 9
+        x = board._i2x(i)
+        y = board._i2y(i)
+        self.assertEqual(board.expand(x, y), True)
+
+        # every other number should be expanded
+        for number in number_cells.keys():
+            for i in number_cells[number]:
+                rev = number
+                self.assertEqual(board.cells[i], board.REVEALED[rev])
+        return
+
+    def test_expand2(self):
+        #  | A  B  C  D  E  F  G |
+        # 1|    1  F  x  1       |
+        # 2|    1  2  2  1       |
+        # 3|       F  F          |
+        # 4|                     |
+
+        board = Board()
+        board.init(7, 4, 0, 0)
+        board.cells = [board.UNREVEALED] * 28
+
+        mines = set([2, 3])
+
+        number_cells = {
+            0: set([0, 5, 6,
+                   7, 12, 13,
+                   14, 15, 16, 17, 18, 19, 20,
+                   21, 22, 23, 24, 25, 26, 27]),
+            1: set([1, 4, 8, 11]),
+            2: set([9, 10]),
+            3: set([]),
+            4: set([]),
+            5: set([]),
+            6: set([]),
+            7: set([]),
+            8: set([])
+        }
+
+        for i in mines:
+            mine = Mine(board._i2x(i), board._i2y(i))
+            board.mines.append(mine)
+
+        # set flags
+        for i in [2, 16, 17]:
+            x = board._i2x(i)
+            y = board._i2y(i)
+            board.cells[i] = board.FLAG
+
+        # reveal 9th
+        i = 9
+        board.cells[i] = board.REVEALED[2]
+
+        # expand from too many flags
+        x = board._i2x(i)
+        y = board._i2y(i)
+        self.assertEqual(board.expand(x, y), False)
+
+        # every other number should not be revealed
+        for number in number_cells.keys():
+            for i in number_cells[number]:
+                if i == 9 or i in [2, 16, 17]:
+                    continue
+                self.assertEqual(board.cells[i], board.UNREVEALED)
+        return
+
+    def test_expand3(self):
+        #  | A  B  C  D  E  F  G |
+        # 1|    1  F  x  1       |
+        # 2|    1  2  2  1       |
+        # 3|    0  F  0          |
+        # 4|                     |
+
+        board = Board()
+        board.init(7, 4, 0, 0)
+        board.cells = [board.UNREVEALED] * 28
+
+        mines = set([2, 3])
+
+        for i in mines:
+            mine = Mine(board._i2x(i), board._i2y(i))
+            board.mines.append(mine)
+
+        # set flags
+        for i in [2, 16]:
+            x = board._i2x(i)
+            y = board._i2y(i)
+            board.cells[i] = board.FLAG
+
+        # expand a wrong flag
+        i = 9
+        x = board._i2x(i)
+        y = board._i2y(i)
+        board.cells[i] = board.REVEALED[2]
+        self.assertEqual(board.expand(x, y), True)
+
+        # flags should be untouched
+        self.assertEqual(board.cells[2], board.FLAG)
+        self.assertEqual(board.cells[16], board.FLAG)
+        # some number should be revealed
+        self.assertEqual(board.cells[1], board.REVEALED[1])
+        self.assertEqual(board.cells[8], board.REVEALED[1])
+        self.assertEqual(board.cells[9], board.REVEALED[2])
+        self.assertEqual(board.cells[10], board.REVEALED[2])
+        self.assertEqual(board.cells[15], board.REVEALED[0])
+        self.assertEqual(board.cells[17], board.REVEALED[0])
+        # mine is revealed
+        self.assertEqual(board.cells[3], board.MINE)
+        return
 
     # def test_system1(self):
     #     pass
