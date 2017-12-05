@@ -152,16 +152,9 @@ class Board:
         if self.cells[i] in self.REVEALED:
             expect_num_flags = self.REVEALED.index(self.cells[i])
             actual_num_flags = self._count_flags(x, y)
-
             if expect_num_flags == actual_num_flags:
-                self.reveal(x-1, y-1)
-                self.reveal(x-1, y )
-                self.reveal(x-1, y+1)
-                self.reveal(x, y-1)
-                self.reveal(x, y+1)
-                self.reveal(x+1, y-1)
-                self.reveal(x+1, y )
-                self.reveal(x+1, y+1)
+                for rx, ry in self.gen_scan_cells(x, y):
+                    self.reveal(rx, ry)
                 return True
         return False
 
@@ -174,15 +167,19 @@ class Board:
 
     def _count_flags(self, x, y):
         num_flags = 0
-        scan_cells = [(x-1, y-1), (x, y-1), (x+1, y-1),
-                      (x-1, y), (x+1, y),
-                      (x-1, y+1), (x, y+1), (x+1, y+1)]
-        for fx, fy in scan_cells:
-            if fx < 0 or fx > self.width:
-                continue
-            if fy < 0 or fy > self.height:
-                continue
+        for fx, fy in self.gen_scan_cells(x, y):
             i = self._xy2i(fx, fy)
             if self.cells[i] == self.FLAG:
                 num_flags += 1
         return num_flags
+
+    def gen_scan_cells(self, x, y):
+        scan_cells = [(x-1, y-1), (x, y-1), (x+1, y-1),
+                      (x-1, y), (x+1, y),
+                      (x-1, y+1), (x, y+1), (x+1, y+1)]
+        for x, y in scan_cells:
+            if x < 1 or x > self.width:
+                continue
+            if y < 1 or y > self.height:
+                continue
+            yield x, y

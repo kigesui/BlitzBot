@@ -19,13 +19,16 @@ class MinesweeperModule(IModule):
 
         # start new game
         if command == "ms":
-            if not re.match("^ms (beginner|intermediate)$", cmd):
+            if not re.match("^ms( (beginner|intermediate))?$", cmd):
                 embed = EmbedHelper.error(
-                    "Usage: {}ms beginner|intermediate".format(
+                    "Usage: {}ms [beginner|intermediate]".format(
                         BotConfig().get_botprefix()))
                 return [ExecResp(code=500, args=embed)]
 
-            level = cmd_args[1]
+            level = "beginner"
+            if len(cmd_args) > 1:
+                level = cmd_args[1]
+
             if level == "beginner":
                 w = 8
                 h = 8
