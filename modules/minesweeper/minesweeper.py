@@ -129,11 +129,17 @@ class MinesweeperModule(IModule):
             # BotLogger().info("checked")
             ret_list = func(self, *arg, **kw)
             if self.__board.game_lose():
-                embed = EmbedHelper.success("Game Over! Try Again.")
+                emoji = '\U0001F635'
+                msg = "Game Over! Try Again. {}".format(emoji)
+                embed = EmbedHelper.success(msg)
                 ret_list.append(ExecResp(code=200, args=embed))
-            if self.__board.game_won():
-                embed = EmbedHelper.success("Congratulation! You Won.")
+                self.stop_game()
+            elif self.__board.game_won():
+                emoji = '\U0001F60E'
+                msg = "Congratulation! You Won. {}".format(emoji)
+                embed = EmbedHelper.success(msg)
                 ret_list.append(ExecResp(code=200, args=embed))
+                self.stop_game()
             return ret_list
         return func_warpper
 
@@ -148,7 +154,6 @@ class MinesweeperModule(IModule):
         return [ExecResp(code=200, args=embed)]
 
     @game_running()
-    @add_display
     def stop_game(self):
         self.__board = None
         embed = EmbedHelper.success("Minesweeper Stopped.")

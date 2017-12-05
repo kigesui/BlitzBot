@@ -12,8 +12,8 @@ class Mine:
 
 class Board:
 
-    UNREVEALED = ' '
-    REVEALED = "012345678"
+    UNREVEALED = '?'
+    REVEALED = " 12345678"
     FLAG = 'F'
     MINE = '*'
 
@@ -42,17 +42,23 @@ class Board:
         # print col header
         for i in range(self.width):
             board_str += "{:_>2}".format(chr(0x40+i+1))
-        board_str += "_|"
+        board_str += "_|__\n"
 
         # print each row
         for y in range(self.height):
             y += 1
-            board_str += "\n{:>2}|".format(y)
+            board_str += "{:>2}|".format(y)
             for x in range(self.width):
                 x += 1
                 i = self._xy2i(x, y)
                 board_str += "{:>2}".format(self.cells[i])
-            board_str += " |"
+            board_str += " |{:<2}\n".format(y)
+
+        # print col footer
+        board_str += "--|"
+        for i in range(self.width):
+            board_str += "{:->2}".format(chr(0x40+i+1))
+        board_str += "-|--"
         return board_str
 
     # init
