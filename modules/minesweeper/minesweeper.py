@@ -46,36 +46,30 @@ class MinesweeperModule(IModule):
 
         # reveal
         if command == "msr":
-            if not re.match("^msr [A-Za-z][0-9]+$", cmd):
-                msg = "Usage: {}msr A1".format(
+            if not re.match("^msr( [A-Za-z][0-9]+)+$", cmd):
+                msg = "Usage: {}msr A1 A2 ...".format(
                       BotConfig().get_botprefix())
                 embed = EmbedHelper.error(msg)
                 return [ExecResp(code=500, args=embed)]
-
-            x, y = self.convert_input(cmd_args[1])
-            return self.reveal(x, y)
+            return self.reveal_all(cmd_args[1:])
 
         # expand
         if command == "mse":
-            if not re.match("^mse [A-Za-z][0-9]+$", cmd):
+            if not re.match("^mse( [A-Za-z][0-9]+)+$", cmd):
                 msg = "Usage: {}mse A1".format(
                       BotConfig().get_botprefix())
                 embed = EmbedHelper.error(msg)
                 return [ExecResp(code=500, args=embed)]
-
-            x, y = self.convert_input(cmd_args[1])
-            return self.expand(x, y)
+            return self.expand_all(cmd_args[1:])
 
         # flag
         if command == "msf":
-            if not re.match("^msf [A-Za-z][0-9]+$", cmd):
+            if not re.match("^msf( [A-Za-z][0-9]+)+$", cmd):
                 msg = "Usage: {}msf A1".format(
                       BotConfig().get_botprefix())
                 embed = EmbedHelper.error(msg)
                 return [ExecResp(code=500, args=embed)]
-
-            x, y = self.convert_input(cmd_args[1])
-            return self.flag(x, y)
+            return self.flag_all(cmd_args[1:])
 
         if command == "msd":
             if not re.match("^msd$", cmd):
@@ -169,6 +163,14 @@ class MinesweeperModule(IModule):
 
     @game_running()
     @add_display
+    def flag_all(self, locations):
+        ret_list = []
+        for loc in locations:
+            x, y = self.convert_input(loc)
+            ret_list.append(self.flag(x, y))
+        return ret_list
+
+    @game_running()
     def flag(self, x, y):
         x_str = chr(x+0x40)
         if self.__board.flag(x, y):
@@ -176,11 +178,19 @@ class MinesweeperModule(IModule):
         else:
             embed = EmbedHelper.warning("{0}{1} is revealed or invalid"
                                         .format(x_str, y))
-        return [ExecResp(code=200, args=embed)]
+        return ExecResp(code=200, args=embed)
 
     @game_running()
     @check_win_lose
     @add_display
+    def reveal_all(self, locations):
+        ret_list = []
+        for loc in locations:
+            x, y = self.convert_input(loc)
+            ret_list.append(self.reveal(x, y))
+        return ret_list
+
+    @game_running()
     def reveal(self, x, y):
         x_str = chr(x+0x40)
         if self.__board.reveal(x, y):
@@ -188,11 +198,19 @@ class MinesweeperModule(IModule):
         else:
             embed = EmbedHelper.warning("{0}{1} already revealed or invalid"
                                         .format(x_str, y))
-        return [ExecResp(code=200, args=embed)]
+        return ExecResp(code=200, args=embed)
 
     @game_running()
     @check_win_lose
     @add_display
+    def expand_all(self, locations):
+        ret_list = []
+        for loc in locations:
+            x, y = self.convert_input(loc)
+            ret_list.append(self.expand(x, y))
+        return ret_list
+
+    @game_running()
     def expand(self, x, y):
         x_str = chr(x+0x40)
         if self.__board.expand(x, y):
@@ -200,4 +218,4 @@ class MinesweeperModule(IModule):
         else:
             embed = EmbedHelper.warning("{0}{1} cannot be expanded"
                                         .format(x_str, y))
-        return [ExecResp(code=200, args=embed)]
+        return ExecResp(code=200, args=embed)
