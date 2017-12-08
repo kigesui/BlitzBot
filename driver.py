@@ -2,6 +2,7 @@ import discord
 # from discord.ext.commands import Bot
 # from discord.ext import commands
 from time import strftime, localtime
+import re
 import traceback
 
 from modules.i_module import ExecArgs
@@ -10,11 +11,15 @@ from utils.bot_config import BotConfig
 from utils.bot_db import BotDB
 from utils.module_loader import ModuleLoader
 
+# declare global variable
+BOT_PREFIX = ''
+
 
 def main():
     BotLogger().info("Starting Bot ...")
 
     # init some global values
+    global BOT_PREFIX
     BOT_PREFIX = BotConfig().get_botprefix()
 
     BotLogger().info("Bot Prefix: {}".format(BOT_PREFIX))
@@ -71,8 +76,15 @@ def main():
         """ Second Round of Content Parsing
             - try to parse with command modules (content with bot prefix)
         """
-        # drop those that are not command
+        # drop stuff not starting with prefix
         if request.content[0] != BOT_PREFIX:
+            return
+
+        # sanitize input
+        sanitized_content = re.sub("\s+", " ", request.content)
+
+        # drop ignored stuff
+        if ignore_content(sanitized_content):
             return
 
         BotLogger().info("----------")
@@ -82,7 +94,7 @@ def main():
         BotLogger().info("Content: {}".format(request.content))
 
         # prepare execute function
-        command = request.content[1:]
+        command = sanitized_content[1:]
 
         is_success = False
         for module in CMD_MODULES:
@@ -206,6 +218,13 @@ async def handle_single_resp(client, request, exec_resp):
         BotLogger().critical(
             "INVALID ExecResp CODE: {}".format(exec_resp.code))
         return -1
+
+
+def ignore_content(content):
+    if re.match("^[\\"+BOT_PREFIX+"]{2}.*$", content):
+        BotLogger().info("Ignoring content: {}".format(content))
+        return True
+    return False
 
 
 # main function call

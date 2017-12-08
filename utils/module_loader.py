@@ -7,6 +7,9 @@ from modules.halls.halls import HallsModule
 from modules.people.people import PeopleModule
 from modules.pokemon.cp import CpModule
 from modules.eat.eat import EatModule
+from modules.crypto.crypto import CryptoModule
+from modules.ns.fetch import FetchModule
+from modules.minesweeper.minesweeper import MinesweeperModule
 
 
 class ModuleLoader:
@@ -28,6 +31,9 @@ class ModuleLoader:
             cmd_modules.append(PeopleModule())
             cmd_modules.append(CpModule())
             cmd_modules.append(EatModule())
+            cmd_modules.append(CryptoModule())
+            cmd_modules.append(FetchModule())
+            cmd_modules.append(MinesweeperModule())
             return cmd_modules
 
     instance = None
