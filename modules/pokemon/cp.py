@@ -110,28 +110,31 @@ class CpModule(IModule):
         # command: cpstr
         # """
         if command == "cpstr":
-            if not re.match("cp {}$".format(self.__POKEMON_REGEX), cmd):
+            if not re.match("cpstr( {})+$".format(self.__POKEMON_REGEX), cmd):
                 embed = Embed()
                 embed.colour = BotConfig().get_hex("Colors", "OnError")
-                embed.description = "Usage: {}cpstr pokemon_name".format(
+                embed.description = "Usage: {}cpstr poke1 poke2 ...".format(
                                     BotConfig().get_botprefix())
                 return [ExecResp(code=500, args=embed)]
 
-            pokemon = cmd_args[1].lower()
-            if pokemon not in self.__pokemon_stats:
-                embed = Embed()
-                embed.colour = BotConfig().get_hex("Colors", "OnError")
-                embed.description = "{} is not a pokemon".format(cmd_args[1])
-                return [ExecResp(code=500, args=embed)]
+            queried_pokemons = [poke.lower() for poke in cmd_args[1:]]
+            for poke in queried_pokemons:
+                if poke not in self.__pokemon_stats:
+                    embed = Embed()
+                    embed.colour = BotConfig().get_hex("Colors", "OnError")
+                    embed.description = "{} is not a pokemon.".format(poke)
+                    return [ExecResp(code=500, args=embed)]
 
-            cps = self._compute_cps(pokemon)
+            all_cps = set()
+            for poke in queried_pokemons:
+                cps = self._compute_cps(poke)
+                for cp in list(cps.values()):
+                    all_cps.add(cp)
 
-            str_out = cmd_args[1] + '&'
-            for i in range(30, 0, -1):
-                if i > 1:
-                    str_out = str_out + 'cp' + str(cps[i]) + ','
-                else:
-                    str_out = str_out + 'cp' + str(cps[i])
+            all_poke = ",".join(queried_pokemons) + '&'
+            sorted_cps = sorted(all_cps, reverse=True)
+            all_cps = ",".join(["cp"+str(cp) for cp in sorted_cps])
+            str_out = all_poke + all_cps
             return [ExecResp(code=210, args=str_out)]
 
         # not handled by this module
