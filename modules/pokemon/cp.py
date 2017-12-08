@@ -80,9 +80,8 @@ class CpModule(IModule):
                                     BotConfig().get_botprefix())
                 return [ExecResp(code=500, args=embed)]
 
-            queried_pokemons = cmd_args[1:]
+            queried_pokemons = [poke.lower() for poke in cmd_args[1:]]
             for poke in queried_pokemons:
-                poke = poke.lower()
                 if poke not in self.__pokemon_stats:
                     embed = Embed()
                     embed.colour = BotConfig().get_hex("Colors", "OnError")
