@@ -102,6 +102,18 @@ class Board:
                 return True
         return False
 
+    def mines_explode(self):
+        for m in self.mines:
+            i = self._xy2i(m.x, m.y)
+            self.cells[i] = self.MINE
+        return True
+
+    def mines_flagged(self):
+        for m in self.mines:
+            i = self._xy2i(m.x, m.y)
+            self.cells[i] = self.FLAG
+        return True
+
     # checks if x and y are valid
     def check_xy(func):
         def func_warpper(self, x, y):

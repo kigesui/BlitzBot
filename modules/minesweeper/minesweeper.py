@@ -19,7 +19,7 @@ class MinesweeperModule(IModule):
 
         # start new game
         if command == "ms":
-            if not re.match("^ms( (beginner|intermediate))?$", cmd):
+            if not re.match("^ms( (beginner|intermediate|test))?$", cmd):
                 embed = EmbedHelper.error(
                     "Usage: {}ms [beginner|intermediate]".format(
                         BotConfig().get_botprefix()))
@@ -38,9 +38,9 @@ class MinesweeperModule(IModule):
                 h = 16
                 m = 40
             else:
-                w = 1
-                h = 1
-                m = 1
+                w = 10
+                h = 10
+                m = 2
 
             return self.start_game(w, h, m)
 
@@ -130,12 +130,16 @@ class MinesweeperModule(IModule):
                 msg = "Game Over! Try Again. {}".format(emoji)
                 embed = EmbedHelper.success(msg)
                 ret_list.append(ExecResp(code=200, args=embed))
+                self.__board.mines_explode()
+                ret_list = ret_list + self.display_board()
                 self.stop_game()
             elif self.__board.game_won():
                 emoji = '\U0001F60E'
                 msg = "Congratulation! You Won. {}".format(emoji)
                 embed = EmbedHelper.success(msg)
                 ret_list.append(ExecResp(code=200, args=embed))
+                self.__board.mines_flagged()
+                ret_list = ret_list + self.display_board()
                 self.stop_game()
             return ret_list
         return func_warpper
@@ -146,6 +150,8 @@ class MinesweeperModule(IModule):
     @add_display
     def start_game(self, w, h, m):
         self.__board = Board()
+        # self.__board.FLAG = '\U0001F6A9'
+        # self.__board.MINE = '\U0001F525'
         self.__board.init(w, h, m)
         embed = EmbedHelper.success("Minesweeper Start!")
         return [ExecResp(code=200, args=embed)]
