@@ -73,35 +73,39 @@ class CpModule(IModule):
         # """
         if command == "cp":
             # BotLogger().debug("CP")
-            if not re.match("cp {}$".format(self.__POKEMON_REGEX), cmd):
+            if not re.match("cp( {})+$".format(self.__POKEMON_REGEX), cmd):
                 embed = Embed()
                 embed.colour = BotConfig().get_hex("Colors", "OnError")
-                embed.description = "Usage: {}cp pokemon_name".format(
+                embed.description = "Usage: {}cp poke1 poke2 ...".format(
                                     BotConfig().get_botprefix())
                 return [ExecResp(code=500, args=embed)]
 
-            pokemon = cmd_args[1].lower()
-            if pokemon not in self.__pokemon_stats:
+            queried_pokemons = cmd_args[1:]
+            for poke in queried_pokemons:
+                poke = poke.lower()
+                if poke not in self.__pokemon_stats:
+                    embed = Embed()
+                    embed.colour = BotConfig().get_hex("Colors", "OnError")
+                    embed.description = "{} is not a pokemon.".format(poke)
+                    return [ExecResp(code=500, args=embed)]
+
+            ret_list = []
+            for poke in queried_pokemons:
+                cps = self._compute_cps(poke)
+
                 embed = Embed()
-                embed.colour = BotConfig().get_hex("Colors", "OnError")
-                embed.description = "{} is not a pokemon".format(cmd_args[1])
-                return [ExecResp(code=500, args=embed)]
-
-            cps = self._compute_cps(pokemon)
-
-            embed = Embed()
-            embed.title = "Max CP for {}".format(cmd_args[1])
-            embed.colour = BotConfig().get_hex("Colors", "OnSuccess")
-            for i in range(30, 0, -10):
-                field_format = "{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}"
-                embed.add_field(name="LV{} to {}:".format(i, i - 9),
-                                value=field_format.format(
-                                cps[i], cps[i - 1], cps[i - 2], cps[i - 3],
-                                cps[i - 4], cps[i - 5], cps[i - 6],
-                                cps[i - 7], cps[i - 8], cps[i - 9]),
-                                inline=True)
-
-            return [ExecResp(code=200, args=embed)]
+                embed.title = "Max CP for {}".format(poke)
+                embed.colour = BotConfig().get_hex("Colors", "OnSuccess")
+                for i in range(30, 0, -10):
+                    field_format = "{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}"
+                    embed.add_field(name="LV{} to {}:".format(i, i - 9),
+                                    value=field_format.format(
+                                    cps[i], cps[i - 1], cps[i - 2], cps[i - 3],
+                                    cps[i - 4], cps[i - 5], cps[i - 6],
+                                    cps[i - 7], cps[i - 8], cps[i - 9]),
+                                    inline=True)
+                ret_list.append(ExecResp(code=200, args=embed))
+            return ret_list
 
         # """
         # command: cpstr
