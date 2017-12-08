@@ -5,8 +5,6 @@ from utils.bot_embed_helper import EmbedHelper
 import math
 import re
 
-from discord import Embed
-
 
 class CpModule(IModule):
 
@@ -75,60 +73,63 @@ class CpModule(IModule):
         # """
         if command == "cp":
             # BotLogger().debug("CP")
-            if not re.match("^cp {}$".format(self.__POKEMON_REGEX), cmd):
-                usage_msg = "Usage: {}cp pokemon_name".format(
-                            BotConfig().get_botprefix())
-                embed = EmbedHelper.error(usage_msg)
-                return [ExecResp(code=500, args=embed)]
-
-            pokemon = cmd_args[1].lower()
-            if pokemon not in self.__pokemon_stats:
-                msg = "{} is not a pokemon".format(cmd_args[1])
+            if not re.match("^cp( {})+$".format(self.__POKEMON_REGEX), cmd):
+                msg = "Usage: {}cp poke1 poke2 ...".format(
+                      BotConfig().get_botprefix())
                 embed = EmbedHelper.error(msg)
                 return [ExecResp(code=500, args=embed)]
 
-            cps = self._compute_cps(pokemon)
+            queried_pokemons = [poke.lower() for poke in cmd_args[1:]]
+            for poke in queried_pokemons:
+                if poke not in self.__pokemon_stats:
+                    msg = "{} is not a pokemon.".format(poke)
+                    embed = EmbedHelper.error(msg)
+                    return [ExecResp(code=500, args=embed)]
 
-            embed = Embed()
-            embed.title = "Max CP for {}".format(cmd_args[1])
-            embed.colour = BotConfig().get_hex("Colors", "OnSuccess")
-            for i in range(30, 0, -10):
-                field_format = "{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}"
-                embed.add_field(name="LV{} to {}:".format(i, i - 9),
-                                value=field_format.format(
-                                cps[i], cps[i - 1], cps[i - 2], cps[i - 3],
-                                cps[i - 4], cps[i - 5], cps[i - 6],
-                                cps[i - 7], cps[i - 8], cps[i - 9]),
-                                inline=True)
+            ret_list = []
+            for poke in queried_pokemons:
+                cps = self._compute_cps(poke)
 
-            return [ExecResp(code=200, args=embed)]
+                embed = EmbedHelper.success()
+                embed.title = "Max CP for {}".format(poke)
+                for i in range(30, 0, -10):
+                    field_format = "{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}"
+                    embed.add_field(name="LV{} to {}:".format(i, i - 9),
+                                    value=field_format.format(
+                                    cps[i], cps[i - 1], cps[i - 2], cps[i - 3],
+                                    cps[i - 4], cps[i - 5], cps[i - 6],
+                                    cps[i - 7], cps[i - 8], cps[i - 9]),
+                                    inline=True)
+                ret_list.append(ExecResp(code=200, args=embed))
+            return ret_list
 
         # """
         # command: cpstr
         # """
         if command == "cpstr":
-            if not re.match("^cpstr {}$".format(self.__POKEMON_REGEX), cmd):
-                embed = Embed()
-                embed.colour = BotConfig().get_hex("Colors", "OnError")
-                embed.description = "Usage: {}cpstr pokemon_name".format(
-                                    BotConfig().get_botprefix())
+            if not re.match("^cpstr( {})+$".format(self.__POKEMON_REGEX), cmd):
+                msg = "Usage: {}cpstr poke1 poke2 ...".format(
+                      BotConfig().get_botprefix())
+                embed = EmbedHelper.error(msg)
                 return [ExecResp(code=500, args=embed)]
 
-            pokemon = cmd_args[1].lower()
-            if pokemon not in self.__pokemon_stats:
-                embed = Embed()
-                embed.colour = BotConfig().get_hex("Colors", "OnError")
-                embed.description = "{} is not a pokemon".format(cmd_args[1])
-                return [ExecResp(code=500, args=embed)]
+            queried_pokemons = [poke.lower() for poke in cmd_args[1:]]
+            for poke in queried_pokemons:
+                if poke not in self.__pokemon_stats:
+                    msg = "{} is not a pokemon.".format(poke)
+                    embed = EmbedHelper.error(msg)
+                    return [ExecResp(code=500, args=embed)]
 
-            cps = self._compute_cps(pokemon)
+            all_cps = set()
+            for poke in queried_pokemons:
+                cps = self._compute_cps(poke)
+                for cp in list(cps.values()):
+                    all_cps.add(cp)
 
-            str_out = cmd_args[1] + '&'
-            for i in range(30, 0, -1):
-                if i > 1:
-                    str_out = str_out + 'cp' + str(cps[i]) + ','
-                else:
-                    str_out = str_out + 'cp' + str(cps[i])
+            all_poke = ",".join(queried_pokemons) + '&'
+            sorted_cps = sorted(all_cps, reverse=True)
+            all_cps = ",".join(["cp"+str(cp) for cp in sorted_cps])
+            str_out = all_poke + all_cps
             return [ExecResp(code=210, args=str_out)]
 
         # not handled by this module
