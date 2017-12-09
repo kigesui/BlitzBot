@@ -10,6 +10,8 @@ class CpModule(IModule):
 
     __POKEMON_REGEX = "[\.a-zA-Z\'\-]+"
 
+    __WILD_CP_LIMIT = 35
+
     __CP_MULTIPLIER = [
         0.094, 0.16639787, 0.21573247, 0.25572005, 0.29024988,
         0.3210876, 0.34921268, 0.37523559, 0.39956728, 0.42250001,
@@ -58,7 +60,7 @@ class CpModule(IModule):
         base_def = pokemon_stat["def"]
         base_sta = pokemon_stat["sta"]
         out = {}
-        for lvl in range(1, 31):
+        for lvl in range(1, self.__WILD_CP_LIMIT+1):
             out[lvl] = self._compute_cp(lvl, base_atk, base_def, base_sta,
                                         iv_atk, iv_def, iv_sta)
         return out
@@ -89,17 +91,30 @@ class CpModule(IModule):
             ret_list = []
             for poke in queried_pokemons:
                 cps = self._compute_cps(poke)
+                cps = list(sorted(cps.values(), reverse=True))
 
                 embed = EmbedHelper.success()
                 embed.title = "Max CP for {}".format(poke)
-                for i in range(30, 0, -10):
-                    field_format = "{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}"
-                    embed.add_field(name="LV{} to {}:".format(i, i - 9),
-                                    value=field_format.format(
-                                    cps[i], cps[i - 1], cps[i - 2], cps[i - 3],
-                                    cps[i - 4], cps[i - 5], cps[i - 6],
-                                    cps[i - 7], cps[i - 8], cps[i - 9]),
-                                    inline=True)
+                i = 0
+                while i < len(cps):
+                    lvl = len(cps)-i
+                    if i == 0:
+                        value_format = "`{}{:>5}{:>5}{:>5}{:>5}`"
+                        values = cps[i:i+5]
+                        embed.add_field(
+                            name="LV{} to {}:".format(lvl, lvl-4),
+                            value=value_format.format(*values),
+                            inline=False)
+                        i = i+5
+                    else:
+                        value_format = "`\n{}{:>5}{:>5}{:>5}{:>5}`\n"\
+                                       "`{}{:>5}{:>5}{:>5}{:>5}`"
+                        values = cps[i:i+10]
+                        embed.add_field(
+                            name="LV{} to {}:".format(lvl, lvl-9),
+                            value=value_format.format(*values),
+                            inline=False)
+                        i = i+10
                 ret_list.append(ExecResp(code=200, args=embed))
             return ret_list
 
