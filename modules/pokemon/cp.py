@@ -147,5 +147,30 @@ class CpModule(IModule):
             str_out = all_poke + all_cps
             return [ExecResp(code=210, args=str_out)]
 
+        if command == "cpnot":
+            if not re.match("^cpnot {}$".format(self.__POKEMON_REGEX), cmd):
+                msg = "Usage: {}cpnot poke1 ...".format(
+                      BotConfig().get_botprefix())
+                embed = EmbedHelper.error(msg)
+                return [ExecResp(code=500, args=embed)]
+
+            queried_pokemon = cmd_args[1]
+            if queried_pokemon not in self.__pokemon_stats:
+                msg = "{} is not a pokemon.".format(queried_pokemon)
+                embed = EmbedHelper.error(msg)
+                return [ExecResp(code=500, args=embed)]
+
+            cps = self._compute_cps(queried_pokemon)
+            sorted_cps = sorted(cps.values())
+            notcp_list = []
+            prev_cp = 1
+            for cp in sorted_cps:
+                notcp_list.append(str(prev_cp) + '-' + str(cp-1))
+                prev_cp = cp+1
+            notcp_list.append(str(prev_cp) + '-')
+            str_notcp = ",".join(["cp"+str(cp) for cp in notcp_list])
+            str_out = queried_pokemon + '&' + str_notcp
+            return [ExecResp(code=210, args=str_out)]
+
         # not handled by this module
         return None
