@@ -6,7 +6,7 @@ import math
 import re
 
 
-class CpModule(IModule):
+class HundoModule(IModule):
 
     __POKEMON_REGEX = "[\.a-zA-Z\'\-]+"
 
