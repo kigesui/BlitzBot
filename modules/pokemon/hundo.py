@@ -165,6 +165,13 @@ class HundoModule(IModule):
                     # all_hps.add(hp)
                     # i += 1
 
+            # correction for nidorans
+            for i in range(len(queried_pokemons)):
+                if queried_pokemons[i] == "nidoranm":
+                    queried_pokemons[i] = "nidoran\u2642"
+                if queried_pokemons[i] == "nidoranf":
+                    queried_pokemons[i] = "nidoran\u2640"
+
             all_poke = ','.join(queried_pokemons)
             sorted_cps = sorted(all_cps, reverse=True)
             # sorted_hps = sorted(all_hps, reverse=True)
