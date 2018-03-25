@@ -1,12 +1,13 @@
 from ..i_module import IModule, ExecResp
-# from utils.bot_logger import BotLogger
+from utils.bot_logger import BotLogger
 from utils.bot_config import BotConfig
 from utils.bot_embed_helper import EmbedHelper
 import math
 import re
+import json
 
 
-class HundoModule(IModule):
+class CpModule(IModule):
 
     __POKEMON_REGEX = "[\.a-zA-Z\'\-]+"
 
@@ -24,7 +25,9 @@ class HundoModule(IModule):
 
     def __init__(self):
         self.__pokemon_stats = self._get_pokemon_stats()
+        self.__common_pokemons = self._get_common_pokemons()
         # BotLogger().debug(self.__pokemon_stats)
+        # BotLogger().debug(self.__common_pokemons)
         return
 
     def _get_pokemon_stats(self):
@@ -42,6 +45,15 @@ class HundoModule(IModule):
                 stats[poke]["def"] = int(line_items[2])
                 stats[poke]["sta"] = int(line_items[3])
         return stats
+
+    def _get_common_pokemons(self):
+        # returns a dictionary where the pokemon name is the key
+        # the value is another dictionary, with key "atk", "def", "sta"
+        file = "./modules/pokemon/weather_cps.json"
+        commons = {}
+        with open(file, "r") as fp:
+            commons = json.loads(fp.read())
+        return commons
 
     def _compute_cp(self, level,
                     base_atk, base_def, base_sta,
@@ -78,6 +90,9 @@ class HundoModule(IModule):
             out[lvl] = self._compute_hp(lvl, base_sta, iv_sta)
         return out
 
+    # """
+    # Main Execute Function
+    # """
     def execute(self, cmd, exec_args):
         cmd_args = cmd.split(' ')
 
@@ -85,7 +100,6 @@ class HundoModule(IModule):
 
         # """
         # command: cp
-        # """
         if command == "cp":
             if not re.match("^cp( {})+$".format(self.__POKEMON_REGEX), cmd):
                 msg = "Usage: {}cp poke1 poke2 ...".format(
@@ -100,39 +114,10 @@ class HundoModule(IModule):
                     embed = EmbedHelper.error(msg)
                     return [ExecResp(code=500, args=embed)]
 
-            ret_list = []
-            for poke in queried_pokemons:
-                cps = self._compute_cps(poke)
-                cps = list(sorted(cps.values(), reverse=True))
-
-                embed = EmbedHelper.success()
-                embed.title = "Max CP for {}".format(poke)
-                i = 0
-                while i < len(cps):
-                    lvl = len(cps)-i
-                    if i == 0:
-                        value_format = "`{}{:>5}{:>5}{:>5}{:>5}`"
-                        values = cps[i:i+5]
-                        embed.add_field(
-                            name="LV{} to {}:".format(lvl, lvl-4),
-                            value=value_format.format(*values),
-                            inline=False)
-                        i = i+5
-                    else:
-                        value_format = "`\n{}{:>5}{:>5}{:>5}{:>5}`\n"\
-                                       "`{}{:>5}{:>5}{:>5}{:>5}`"
-                        values = cps[i:i+10]
-                        embed.add_field(
-                            name="LV{} to {}:".format(lvl, lvl-9),
-                            value=value_format.format(*values),
-                            inline=False)
-                        i = i+10
-                ret_list.append(ExecResp(code=200, args=embed))
-            return ret_list
+            return self.__handle_cp(queried_pokemons)
 
         # """
         # command: cpstr
-        # """
         if command == "cpstr":
             if not re.match("^cpstr( {})+$".format(self.__POKEMON_REGEX), cmd):
                 msg = "Usage: {}cpstr poke1 poke2 ...".format(
@@ -147,69 +132,112 @@ class HundoModule(IModule):
                     embed = EmbedHelper.error(msg)
                     return [ExecResp(code=500, args=embed)]
 
-            # i = 0
-            all_cps = set()
-            for poke in queried_pokemons:
-                cps = self._compute_cps(poke)
-                for cp in list(cps.values()):
-                    # print("{} {}".format(i, cp))
-                    all_cps.add(cp)
-                    # i += 1
+            return self.__handle_cpstr(queried_pokemons)
 
-            # i = 0
-            # all_hps = set()
-            # for poke in queried_pokemons:
-            #     hps = self._compute_hps(poke)
-            #     for hp in list(hps.values()):
-                    # print("{} {}".format(i, hp))
-                    # all_hps.add(hp)
-                    # i += 1
-
-            # correction for nidorans
-            for i in range(len(queried_pokemons)):
-                if queried_pokemons[i] == "nidoranm":
-                    queried_pokemons[i] = "nidoran\u2642"
-                if queried_pokemons[i] == "nidoranf":
-                    queried_pokemons[i] = "nidoran\u2640"
-
-            all_poke = ','.join(queried_pokemons)
-            sorted_cps = sorted(all_cps, reverse=True)
-            # sorted_hps = sorted(all_hps, reverse=True)
-            all_cps = ','.join(["cp"+str(cp) for cp in sorted_cps])
-            # all_hps = ','.join(["hp"+str(hp) for hp in sorted_hps])
-            str_out = all_poke + '&' + all_cps  # + '&' + all_hps
-
-            if len(queried_pokemons) > 1:
-                poke_out = ','.join(queried_pokemons)
-                return [ExecResp(code=210, args=str_out),
-                        ExecResp(code=210, args=poke_out)]
-            else:
-                return [ExecResp(code=210, args=str_out)]
-
-        if command == "cpnot":
-            if not re.match("^cpnot {}$".format(self.__POKEMON_REGEX), cmd):
-                msg = "Usage: {}cpnot pokemon".format(
-                      BotConfig().get_botprefix())
+        # """
+        # command: cpstrw
+        if command == "cpstrw":
+            weathers = self.__common_pokemons["weather"].keys()
+            weathers_str = "|".join(weathers)
+            if not re.match("^cpstrw ({})$".format(weathers_str), cmd):
+                msg = "Usage: {}cpstrw [{}]".format(
+                      BotConfig().get_botprefix(),
+                      weathers_str)
                 embed = EmbedHelper.error(msg)
                 return [ExecResp(code=500, args=embed)]
 
-            queried_pokemon = cmd_args[1]
-            if queried_pokemon not in self.__pokemon_stats:
-                msg = "{} is not a pokemon.".format(queried_pokemon)
+            weather = cmd_args[1]
+            return self.__handle_cpstrw(weather)
+
+        # """
+        # command: cpstrc
+        if command == "cpstrc":
+            if not re.match("^cpstrc$", cmd):
+                msg = "Usage: {}cpstrc".format(BotConfig().get_botprefix())
                 embed = EmbedHelper.error(msg)
                 return [ExecResp(code=500, args=embed)]
 
-            cps = self._compute_cps(queried_pokemon)
-            sorted_cps = sorted(cps.values())
-            notcp_list = []
-            prev_cp = 1
-            for cp in sorted_cps:
-                notcp_list.append(str(prev_cp) + '-' + str(cp-1))
-                prev_cp = cp + 1
-            notcp_list.append(str(prev_cp) + '-')
-            str_notcp = ','.join(["cp"+str(cp) for cp in notcp_list])
-            str_out = queried_pokemon + '&' + str_notcp
-            return [ExecResp(code=210, args=str_out)]
+            return self.__handle_cpstrc()
 
         # not handled by this module
         return None
+
+    # """
+    # command handler: cp
+    # """
+    def __handle_cp(self, queried_pokemons):
+        ret_list = []
+        for poke in queried_pokemons:
+            cps = self._compute_cps(poke)
+            cps = list(sorted(cps.values(), reverse=True))
+
+            embed = EmbedHelper.success()
+            embed.title = "Max CP for {}".format(poke)
+            i = 0
+            while i < len(cps):
+                lvl = len(cps)-i
+                if i == 0:
+                    value_format = "`{}{:>5}{:>5}{:>5}{:>5}`"
+                    values = cps[i:i+5]
+                    embed.add_field(
+                        name="LV{} to {}:".format(lvl, lvl-4),
+                        value=value_format.format(*values),
+                        inline=False)
+                    i = i+5
+                else:
+                    value_format = "`\n{}{:>5}{:>5}{:>5}{:>5}`\n"\
+                                   "`{}{:>5}{:>5}{:>5}{:>5}`"
+                    values = cps[i:i+10]
+                    embed.add_field(
+                        name="LV{} to {}:".format(lvl, lvl-9),
+                        value=value_format.format(*values),
+                        inline=False)
+                    i = i+10
+            ret_list.append(ExecResp(code=200, args=embed))
+        # end for
+        return ret_list
+
+    # """
+    # command handler: cpstr
+    # """
+    def __handle_cpstr(self, queried_pokemons):
+        all_cps = set()
+        for poke in queried_pokemons:
+            cps = self._compute_cps(poke)
+            for cp in list(cps.values()):
+                all_cps.add(cp)
+
+        # correction for nidorans
+        for i in range(len(queried_pokemons)):
+            if queried_pokemons[i] == "nidoranm":
+                queried_pokemons[i] = "nidoran\u2642"
+            if queried_pokemons[i] == "nidoranf":
+                queried_pokemons[i] = "nidoran\u2640"
+
+        all_poke = ','.join(queried_pokemons)
+        sorted_cps = sorted(all_cps, reverse=True)
+        all_cps = ','.join(["cp"+str(cp) for cp in sorted_cps])
+        str_out = all_poke + '&' + all_cps
+
+        if len(queried_pokemons) > 1:
+            poke_out = ','.join(queried_pokemons)
+            return [ExecResp(code=210, args=str_out),
+                    ExecResp(code=210, args=poke_out)]
+        else:
+            return [ExecResp(code=210, args=str_out)]
+
+    # """
+    # command handler: cpstrw
+    # """
+    def __handle_cpstrw(self, weather):
+        weather_mons = self.__common_pokemons["weather"][weather]
+        weather_mons = [poke.lower() for poke in weather_mons]
+        return self.__handle_cpstr(weather_mons)
+
+    # """
+    # command handler: cpstrc
+    # """
+    def __handle_cpstrc(self):
+        common_mons = self.__common_pokemons["commons"]
+        common_mons = [poke.lower() for poke in common_mons]
+        return self.__handle_cpstr(common_mons)
