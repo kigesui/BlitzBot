@@ -1,5 +1,7 @@
 #!/bin/sh
 
+make init test
+
 # check log folder
 LOG_DIR='./logs'
 if [ ! -d "$LOG_DIR" ]; then
@@ -10,7 +12,7 @@ fi
 # check db folder
 SQLITE_DIR='./data'
 if [ ! -d "$SQLITE_DIR" ]; then
-  echo "creating directory for directory ..."
+  echo "creating directory for data ..."
   mkdir $SQLITE_DIR
 fi
 

@@ -1,6 +1,6 @@
 from ..i_module import IModule, ExecResp
-
 # from utils.bot_logger import BotLogger
+import re
 
 from discord import Emoji
 
@@ -19,7 +19,7 @@ class AutoReactModule(IModule):
 
     def execute(self, cmd, exec_args):
 
-        if "entai" in cmd.lower():
+        if re.match(".*ent[ae]i.*", cmd.lower()):
             return [ExecResp(code=220, args=self.__emoji_hentai)]
 
         return None

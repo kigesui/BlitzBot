@@ -1,0 +1,21 @@
+{
+  "weather": {
+    "sunny" : [
+      "cacnea"
+      ],
+    "rainy" : [
+      "plusle", "minun"],
+    "partly" : [
+      ],
+    "cloudy" : [
+      ],
+    "windy" : [
+      ],
+    "snow" : [
+      ],
+    "fog" : [
+      ]
+  },
+  "commons": [
+    "Pidgey", "rattata", "spearow", "natu", "taillow", "whismur"]
+}
