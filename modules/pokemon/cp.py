@@ -1,95 +1,29 @@
 from ..i_module import IModule, ExecResp
-from utils.bot_logger import BotLogger
+# from utils.bot_logger import BotLogger
 from utils.bot_config import BotConfig
 from utils.bot_embed_helper import EmbedHelper
-import math
 import re
 import json
 from fuzzywuzzy import fuzz
+from modules.pokemon.pokestats import PokeStats
 
 
 class CpModule(IModule):
 
     __POKEMON_REGEX = "[\.a-zA-Z\'\-]+"
 
-    __WILD_CP_LIMIT = 35
-
-    __LVL_MULTIPLIER = [
-        0.094, 0.16639787, 0.21573247, 0.25572005, 0.29024988,
-        0.3210876, 0.34921268, 0.37523559, 0.39956728, 0.42250001,
-        0.44310755, 0.46279839, 0.48168495, 0.49985844, 0.51739395,
-        0.53435433, 0.55079269, 0.56675452, 0.58227891, 0.59740001,
-        0.61215729, 0.62656713, 0.64065295, 0.65443563, 0.667934,
-        0.68116492, 0.69414365, 0.70688421, 0.71939909, 0.7317,
-        0.73776948, 0.74378943, 0.74976104, 0.75568551, 0.76156384,
-        0.76739717, 0.7731865, 0.77893275, 0.78463697, 0.79030001]
-
     def __init__(self):
-        self.__pokemon_stats = self._get_pokemon_stats()
         self.__common_pokemons = self._get_common_pokemons()
-        # BotLogger().debug(self.__pokemon_stats)
+        self.__pokestats = PokeStats()
         # BotLogger().debug(self.__common_pokemons)
         return
 
-    def _get_pokemon_stats(self):
-        # returns a dictionary where the pokemon name is the key
-        # the value is another dictionary, with key "atk", "def", "sta"
-        file = "./modules/pokemon/stats"
-        stats = {}
-        with open(file) as fp:
-            lines = fp.read().splitlines()
-            for line in lines:
-                line_items = line.split()
-                poke = line_items[0].lower()
-                stats[poke] = {}
-                stats[poke]["atk"] = int(line_items[1])
-                stats[poke]["def"] = int(line_items[2])
-                stats[poke]["sta"] = int(line_items[3])
-        return stats
-
     def _get_common_pokemons(self):
-        # returns a dictionary where the pokemon name is the key
-        # the value is another dictionary, with key "atk", "def", "sta"
         file = "./modules/pokemon/weather_cps.json"
         commons = {}
         with open(file, "r") as fp:
             commons = json.loads(fp.read())
         return commons
-
-    def _compute_cp(self, level,
-                    base_atk, base_def, base_sta,
-                    iv_atk=15, iv_def=15, iv_sta=15):
-            m = self.__LVL_MULTIPLIER[level - 1]
-            atk = (base_atk + iv_atk) * m
-            defen = (base_def + iv_def) * m
-            sta = (base_sta + iv_sta) * m
-            cp = max(10, math.floor(math.sqrt(atk * atk * defen * sta) / 10))
-            return cp
-
-    def _compute_cps(self, pokemon, iv_atk=15, iv_def=15, iv_sta=15):
-        pokemon_stat = self.__pokemon_stats[pokemon]
-        base_atk = pokemon_stat["atk"]
-        base_def = pokemon_stat["def"]
-        base_sta = pokemon_stat["sta"]
-        out = {}
-        for lvl in range(1, self.__WILD_CP_LIMIT+1):
-            out[lvl] = self._compute_cp(lvl, base_atk, base_def, base_sta,
-                                        iv_atk, iv_def, iv_sta)
-        return out
-
-    def _compute_hp(self, level, base_sta, iv_sta=15):
-            m = self.__LVL_MULTIPLIER[level - 1]
-            sta = (base_sta + iv_sta) * m
-            hp = max(10, math.floor(sta))
-            return hp
-
-    def _compute_hps(self, pokemon, iv_sta=15):
-        pokemon_stat = self.__pokemon_stats[pokemon]
-        base_sta = pokemon_stat["sta"]
-        out = {}
-        for lvl in range(1, self.__WILD_CP_LIMIT+1):
-            out[lvl] = self._compute_hp(lvl, base_sta, iv_sta)
-        return out
 
     # """
     # Main Execute Function
@@ -110,7 +44,7 @@ class CpModule(IModule):
 
             queried_pokemons = [poke.lower() for poke in cmd_args[1:]]
             for poke in queried_pokemons:
-                if poke not in self.__pokemon_stats:
+                if not self.__pokestats.contains(poke):
                     msg = "{} is not a pokemon.".format(poke)
                     embed = EmbedHelper.error(msg)
                     return [ExecResp(code=500, args=embed)]
@@ -129,12 +63,19 @@ class CpModule(IModule):
             queried_pokemons = [poke.lower() for poke in cmd_args[1:]]
             guess_lst = []
             for poke in queried_pokemons:
+<<<<<<< Updated upstream
                 ratio = {}
                 for name in self.__pokemon_stats:
                     r = fuzz.ratio(poke, name)
                     ratio[name] = r
                 guess_lst.append(max(ratio, key=lambda k: ratio[k]))
             queried_pokemons = guess_lst
+=======
+                if not self.__pokestats.contains(poke):
+                    msg = "{} is not a pokemon.".format(poke)
+                    embed = EmbedHelper.error(msg)
+                    return [ExecResp(code=500, args=embed)]
+>>>>>>> Stashed changes
 
             return self.__handle_cpstr(queried_pokemons)
 
@@ -166,13 +107,64 @@ class CpModule(IModule):
         # not handled by this module
         return None
 
+    def _compute_cp_resps(self, pokemons, num_per_block=0):
+        # return these responses:
+        # example: 5 pokemons and 3 per block
+        #       poke1,poke2,poke3&cp1,cp2,...
+        #       poke4,poke5&cp1,cp2,...
+        #       poke1,poke2,poke3,poke4,poke5
+        pokemons = [poke.lower() for poke in pokemons]
+        responses = []
+        all_pokes_fixed = []
+        temp_pokes = set()
+        temp_cps = set()
+        counter = 0
+
+        def add_pokecps_to_response(pokes, cps):
+            sorted_cps = sorted(cps, reverse=True)
+            cps_str = ','.join(["cp"+str(cp) for cp in sorted_cps])
+            pokes_str = ','.join(pokes)
+            responses.append(ExecResp(code=210, args=pokes_str+'&'+cps_str))
+            responses.append(ExecResp(code=210, args="==v=="))
+
+        for poke in pokemons:
+            counter = counter + 1
+            cps = self.__pokestats.get_wild_poke_cps(poke)
+
+            # fix some pokemon strings
+            poke = self.__fix_poke_name(poke)
+            all_pokes_fixed.append(poke)
+
+            # add to temporary array
+            temp_pokes.add(poke)
+            for cp in list(cps.values()):
+                temp_cps.add(cp)
+
+            if num_per_block != 0:
+                if (counter % num_per_block) == 0:
+                    add_pokecps_to_response(temp_pokes, temp_cps)
+                    temp_pokes = set()
+                    temp_cps = set()
+
+        # output if there are any remainings
+        if temp_pokes:
+            add_pokecps_to_response(temp_pokes, temp_cps)
+
+        # add last line
+        if len(all_pokes_fixed) > 1:
+            fixed_pokes_str = ','.join(all_pokes_fixed)
+            responses.append(ExecResp(code=210, args=fixed_pokes_str))
+            responses.append(ExecResp(code=210, args="====="))
+
+        return responses
+
     # """
     # command handler: cp
     # """
-    def __handle_cp(self, queried_pokemons):
+    def __handle_cp(self, pokemons):
         ret_list = []
-        for poke in queried_pokemons:
-            cps = self._compute_cps(poke)
+        for poke in pokemons:
+            cps = self.__pokestats.get_wild_poke_cps(poke)
             cps = list(sorted(cps.values(), reverse=True))
 
             embed = EmbedHelper.success()
@@ -204,44 +196,29 @@ class CpModule(IModule):
     # """
     # command handler: cpstr
     # """
-    def __handle_cpstr(self, queried_pokemons):
-        all_cps = set()
-        for poke in queried_pokemons:
-            cps = self._compute_cps(poke)
-            for cp in list(cps.values()):
-                all_cps.add(cp)
-
-        # correction for nidorans
-        for i in range(len(queried_pokemons)):
-            if queried_pokemons[i] == "nidoranm":
-                queried_pokemons[i] = "nidoran\u2642"
-            if queried_pokemons[i] == "nidoranf":
-                queried_pokemons[i] = "nidoran\u2640"
-
-        all_poke = ','.join(queried_pokemons)
-        sorted_cps = sorted(all_cps, reverse=True)
-        all_cps = ','.join(["cp"+str(cp) for cp in sorted_cps])
-        str_out = all_poke + '&' + all_cps
-
-        if len(queried_pokemons) > 1:
-            poke_out = ','.join(queried_pokemons)
-            return [ExecResp(code=210, args=str_out),
-                    ExecResp(code=210, args=poke_out)]
-        else:
-            return [ExecResp(code=210, args=str_out)]
+    def __handle_cpstr(self, pokemons):
+        return self._compute_cp_resps(pokemons, 5)
 
     # """
     # command handler: cpstrw
     # """
     def __handle_cpstrw(self, weather):
         weather_mons = self.__common_pokemons["weather"][weather]
-        weather_mons = [poke.lower() for poke in weather_mons]
-        return self.__handle_cpstr(weather_mons)
+        return self._compute_cp_resps(weather_mons, 4)
 
     # """
     # command handler: cpstrc
     # """
     def __handle_cpstrc(self):
         common_mons = self.__common_pokemons["commons"]
-        common_mons = [poke.lower() for poke in common_mons]
-        return self.__handle_cpstr(common_mons)
+        return self._compute_cp_resps(common_mons, 2)
+
+    # """
+    # Helper Function
+    # """
+    def __fix_poke_name(self, poke):
+        if poke == "nidoranm":
+            poke = "nidoran\u2642"
+        if poke == "nidoranf":
+            poke = "nidoran\u2640"
+        return poke

@@ -4,12 +4,21 @@
       "cacnea"
       ],
     "rainy" : [
-      "plusle", "minun"],
+      "plusle", "minun",
+      "spheal", "venonat", "lotad",
+      "surskit", "seel", "mudkip",
+      "wurmple", "tentacool"],
     "partly" : [
       ],
     "cloudy" : [
       ],
     "windy" : [
+      "baltoy","pidgeotto","pidgeot",
+      "spearow", "murkrow", "gligar",
+      "abra", "natu", "zubat", "golbat",
+      "jynx", "hoppip", "skiploom", "jumpluff",
+      "ralts", "hoothoot", "noctowl", "beldum",
+      "xatu", "spoink", "skarmory"
       ],
     "snow" : [
       ],
@@ -17,5 +26,9 @@
       ]
   },
   "commons": [
-    "Pidgey", "rattata", "spearow", "natu", "taillow", "whismur"]
+    "rattata", "spearow",
+    "natu", "taillow", "whismur",
+    "sentret", "skitty", "zigzagoon",
+    "shuppet", "jigglypuff", "murkrow",
+    "hoothoot"]
 }

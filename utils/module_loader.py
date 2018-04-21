@@ -5,12 +5,11 @@ from modules.automodules.react import AutoReactModule
 from modules.ping.ping import PingModule
 from modules.halls.halls import HallsModule
 from modules.people.people import PeopleModule
-from modules.pokemon.cp import CpModule
+# from modules.pokemon.module import PokemonModule
 from modules.eat.eat import EatModule
 from modules.crypto.crypto import CryptoModule
 from modules.ns.fetch import FetchModule
 from modules.minesweeper.minesweeper import MinesweeperModule
-from modules.pokemon.damage import BreakPointModule
 
 
 class ModuleLoader:
@@ -30,12 +29,11 @@ class ModuleLoader:
             cmd_modules.append(PingModule())
             cmd_modules.append(HallsModule())
             cmd_modules.append(PeopleModule())
-            cmd_modules.append(CpModule())
+            # cmd_modules.append(PokemonModule())
             cmd_modules.append(EatModule())
             cmd_modules.append(CryptoModule())
             cmd_modules.append(FetchModule())
             cmd_modules.append(MinesweeperModule())
-            cmd_modules.append(BreakPointModule())
             return cmd_modules
 
     instance = None
@@ -47,6 +45,3 @@ class ModuleLoader:
     def load_all_modules(self):
         return (ModuleLoader.instance.load_cmd_modules(),
                 ModuleLoader.instance.load_auto_modules())
-
-
-
