@@ -136,6 +136,8 @@ async def handle_multi_resps(client, request, exec_responses):
             1   for not handled by a module, continue trying
             -1  for critical error
     """
+    BotLogger().debug("ALL RESPONSES:")
+    BotLogger().debug(exec_responses)
     for resp in exec_responses:
         retval = await handle_single_resp(client, request, resp)
         if retval == -1:
