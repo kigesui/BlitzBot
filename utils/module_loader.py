@@ -10,6 +10,7 @@ from modules.eat.eat import EatModule
 from modules.crypto.crypto import CryptoModule
 from modules.ns.fetch import FetchModule
 from modules.minesweeper.minesweeper import MinesweeperModule
+from modules.pokemon.damage import BreakPointModule
 
 
 class ModuleLoader:
@@ -34,6 +35,7 @@ class ModuleLoader:
             cmd_modules.append(CryptoModule())
             cmd_modules.append(FetchModule())
             cmd_modules.append(MinesweeperModule())
+            cmd_modules.append(BreakPointModule())
             return cmd_modules
 
     instance = None
