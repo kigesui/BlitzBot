@@ -5,6 +5,7 @@ from utils.bot_embed_helper import EmbedHelper
 import math
 import re
 import json
+from fuzzywuzzy import fuzz
 
 
 class CpModule(IModule):
@@ -126,11 +127,14 @@ class CpModule(IModule):
                 return [ExecResp(code=500, args=embed)]
 
             queried_pokemons = [poke.lower() for poke in cmd_args[1:]]
+            guess_lst = []
             for poke in queried_pokemons:
-                if poke not in self.__pokemon_stats:
-                    msg = "{} is not a pokemon.".format(poke)
-                    embed = EmbedHelper.error(msg)
-                    return [ExecResp(code=500, args=embed)]
+                ratio = {}
+                for name in self.__pokemon_stats:
+                    r = fuzz.ratio(poke, name)
+                    ratio[name] = r
+                guess_lst.append(max(ratio, key=lambda k: ratio[k]))
+            queried_pokemons = guess_lst
 
             return self.__handle_cpstr(queried_pokemons)
 

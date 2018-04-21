@@ -19,7 +19,7 @@ class AutoReactModule(IModule):
 
     def execute(self, cmd, exec_args):
 
-        if re.match(".*ent[ae]i.*", cmd.lower()):
-            return [ExecResp(code=220, args=self.__emoji_hentai)]
+        # if re.match(".*ent[ae]i.*", cmd.lower()):
+        #     return [ExecResp(code=220, args=self.__emoji_hentai)]
 
         return None
