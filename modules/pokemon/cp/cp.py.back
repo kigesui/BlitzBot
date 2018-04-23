@@ -30,7 +30,6 @@ class CpModule(IModule):
     # """
     def execute(self, cmd, exec_args):
         cmd_args = cmd.split(' ')
-
         command = cmd_args[0]
 
         # """
@@ -221,4 +220,6 @@ class CpModule(IModule):
             poke = "nidoran\u2642"
         if poke == "nidoranf":
             poke = "nidoran\u2640"
+        if poke == "mr.mime":
+            poke = "mr. mime"
         return poke
