@@ -1,38 +1,32 @@
 # from utils.bot_logger import BotLogger
+from . import Pokedex
+from .singleton import Singleton
+
 import math
+import os
 
 
-class PokeStats():
+class PokemonStats(Singleton):
 
     __WILD_CP_LIMIT = 35
 
     def __init__(self):
-        stats_file = "./modules/pokemon/stats.txt"
-        self.__pokemon_stats = self.__load_stats(stats_file)
+        self.__LVL_MULTIPLIER = {}
+        cp_mult_file = \
+            os.path.dirname(os.path.realpath(__file__)) \
+            + "/cp_mult.csv"
+        with open(cp_mult_file) as fp:
+            for line in fp:
+                line = line.strip()
+                line_items = line.split(",")
+                self.__LVL_MULTIPLIER[float(line_items[0])] = \
+                    float(line_items[1])
         return
-
-    def __load_stats(self, file):
-        # returns a dictionary where the pokemon name is the key
-        # the value is another dictionary, with key "atk", "def", "sta"
-        stats = {}
-        with open(file) as fp:
-            lines = fp.read().splitlines()
-            for line in lines:
-                line_items = line.split()
-                poke = line_items[0].lower()
-                stats[poke] = {}
-                stats[poke]["atk"] = int(line_items[1])
-                stats[poke]["def"] = int(line_items[2])
-                stats[poke]["sta"] = int(line_items[3])
-        return stats
-
-    def contains(self, pokemon):
-        return pokemon in self.__pokemon_stats
 
     def compute_cp(self, level,
                    base_atk, base_def, base_sta,
                    iv_atk=15, iv_def=15, iv_sta=15):
-            m = self.__LVL_MULTIPLIER[level - 1]
+            m = self.__LVL_MULTIPLIER[level]
             atk = (base_atk + iv_atk) * m
             defen = (base_def + iv_def) * m
             sta = (base_sta + iv_sta) * m
@@ -40,27 +34,31 @@ class PokeStats():
             return cp
 
     def compute_hp(self, level, base_sta, iv_sta=15):
-            m = self.__LVL_MULTIPLIER[level - 1]
+            m = self.__LVL_MULTIPLIER[level]
             sta = (base_sta + iv_sta) * m
             hp = max(10, math.floor(sta))
             return hp
 
-    def get_wild_poke_cps(self, pokemon, iv_atk=15, iv_def=15, iv_sta=15):
-        # return key-value pairs:
-        # key = level, value = cp for that level
-        pokemon_stat = self.__pokemon_stats[pokemon]
-        base_atk = pokemon_stat["atk"]
-        base_def = pokemon_stat["def"]
-        base_sta = pokemon_stat["sta"]
+    def get_wild_pokemon_cps(self, number, iv_atk=15, iv_def=15, iv_sta=15):
+        # in: pokemon number
+        # out: dict where key = level,
+        #                 value = cp for that level
+        #      None if number is invalid
+        stats = Pokedex().get_stats_from_number(number)
+        if stats is None:
+            return None
+        base_atk, base_def, base_sta = stats
         out = {}
         for lvl in range(1, self.__WILD_CP_LIMIT+1):
             out[lvl] = self.compute_cp(lvl, base_atk, base_def, base_sta,
                                        iv_atk, iv_def, iv_sta)
         return out
 
-    def get_wild_poke_hps(self, pokemon, iv_sta=15):
-        pokemon_stat = self.__pokemon_stats[pokemon]
-        base_sta = pokemon_stat["sta"]
+    def get_wild_pokemon_hps(self, number, iv_sta=15):
+        stats = Pokedex().get_stats_from_number(number)
+        if stats is None:
+            return None
+        _, _, base_sta = stats
         out = {}
         for lvl in range(1, self.__WILD_CP_LIMIT+1):
             out[lvl] = self.compute_hp(lvl, base_sta, iv_sta)
