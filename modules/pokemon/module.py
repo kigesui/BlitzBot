@@ -4,10 +4,9 @@ from ..i_module import IModule, ExecResp
 from utils.bot_config import BotConfig
 from utils.bot_embed_helper import EmbedHelper
 from .data import Pokedex, PokemonStats
-from .parsers import CpParser
+from .parsers import CpParser, CpStrParser
 from .parsers import ParserException
 
-import re
 # import json
 # from fuzzywuzzy import fuzz
 import json
@@ -23,6 +22,7 @@ class PokemonModule(IModule):
     def __init__(self):
         lazy_dict = self._get_lazy_dict()
         self.__cp_parser = CpParser(lazy_dict)
+        self.__cpstr_parser = CpStrParser(lazy_dict)
         return
 
     def _get_lazy_dict(self):
@@ -61,8 +61,9 @@ class PokemonModule(IModule):
                 return [ExecResp(code=500, args=embed)]
             args = " ".join(cmd_args[1:])
             try:
-                pokemon_numbers = self.__cp_parser.parse_args(args)
-                return self.__handle_cpstr(pokemon_numbers)
+                pokemon_numbers, break_len = \
+                    self.__cpstr_parser.parse_args(args)
+                return self.__handle_cpstr(pokemon_numbers, break_len)
             except ParserException as e:
                 embed = EmbedHelper.error(str(e))
                 return [ExecResp(code=500, args=embed)]
@@ -108,8 +109,8 @@ class PokemonModule(IModule):
     # """
     # command handler: cpstr
     # """
-    def __handle_cpstr(self, pokemon_numbers):
-        return self._compute_cp_resps(pokemon_numbers, 3)
+    def __handle_cpstr(self, pokemon_numbers, break_len):
+        return self._compute_cp_resps(pokemon_numbers, break_len)
 
     def _compute_cp_resps(self, pokemon_numbers, num_per_block=0):
         # return these responses:

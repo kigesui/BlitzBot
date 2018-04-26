@@ -10,18 +10,18 @@ class PrivateParser():
     def __init__(self, prog, init_lists=None):
         self.__lists = init_lists
         self.__poke_parser = PokemonParser()
-        self.__parser = ArgParser(prog=prog, add_help=False)
-        self.__parser.add_argument("poke", nargs="*", type=str,
-                                   help="poke1 poke2 ...")
-        self.__parser.add_argument("-l", "--list", type=str,
-                                   help="Add pre-defined Pokemon lists []")
+        self.parser = ArgParser(prog=prog, add_help=False)
+        self.parser.add_argument("poke", nargs="*", type=str,
+                                 help="poke1 poke2 ...")
+        self.parser.add_argument("-l", "--list", type=str,
+                                 help="Add pre-defined Pokemon lists []")
         return
 
     def parse_args(self, args):
         args = re.findall(r'(-{0,2}\w+|".*?")', args)
         pokelist = []
         try:
-            args = self.__parser.parse_args(args)
+            args = self.parser.parse_args(args)
             for poke in args.poke:
                 poke = poke.replace("\"", "")
                 if poke not in pokelist:
@@ -32,13 +32,13 @@ class PrivateParser():
                     if poke not in pokelist:
                         pokelist.append(poke)
         except ArgParserException:
-            raise ParserException(self.__parser.format_usage())
+            raise ParserException(self.parser.format_usage())
         # call pokemon parser to get pokemon numbers from name
         pokenumbers = []
         for poke in pokelist:
             pokenumbers.append(self.__poke_parser.parse_name(poke))
             # raise ParserException("{} is not a pokemon".format(poke))
-        return pokenumbers
+        return pokenumbers, args
 
     def _get_pokemons_from_lists(self, pokelist_str):
         if not self.__lists:
@@ -64,7 +64,8 @@ class CpParser:
             CpParser.instance = PrivateParser("cp", init_lists)
 
     def parse_args(self, args):
-        return CpParser.instance.parse_args(args)
+        pokemon_numbers, _ = CpParser.instance.parse_args(args)
+        return pokemon_numbers
 
 
 class CpStrParser:
@@ -74,9 +75,17 @@ class CpStrParser:
     instance = None
 
     """ public methods """
-    def __init__(self):
+    def __init__(self, init_lists=None):
         if not CpStrParser.instance:
-            CpStrParser.instance = PrivateParser("cpstr")
+            CpStrParser.instance = PrivateParser("cpstr", init_lists)
+            CpStrParser.instance.parser.add_argument(
+                "-b", "--breaks", type=int, default=5,
+                help="Break after certain number.")
 
-    def parse(self, command):
-        return CpStrParser.instance.parse(command)
+    def parse_args(self, args):
+        # return list of numbers
+        pokemon_numbers, args = CpStrParser.instance.parse_args(args)
+        break_len = args.breaks
+        if break_len < 1:
+            raise ParserException("-b needs to be a positive integer.")
+        return pokemon_numbers, break_len
