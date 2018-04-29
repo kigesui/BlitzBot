@@ -30,5 +30,10 @@
     "sentret", "skitty", "zigzagoon",
     "shuppet", "jigglypuff", "murkrow",
     "hoothoot", "spheal"
-    ]
+    ],
+  "earth": [
+    "wailmer", "magikarp", "remoraid", "corphish", "carvanha", "poliwag", "feebas",
+    "rhyhorn", "sandshrew", "baltoy", "phanpy", "larvitar",
+    "hoppip", "cacnea", "diglett", "seedot", "shroomish", "oddish"
+  ]
 }
