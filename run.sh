@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -e
+
 make init test
 
 # check log folder

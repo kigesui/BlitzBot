@@ -5,7 +5,7 @@ from modules.automodules.react import AutoReactModule
 from modules.ping.ping import PingModule
 from modules.halls.halls import HallsModule
 from modules.people.people import PeopleModule
-from modules.pokemon.hundo import HundoModule
+from modules.pokemon import PokemonModule
 from modules.eat.eat import EatModule
 from modules.crypto.crypto import CryptoModule
 from modules.ns.fetch import FetchModule
@@ -29,7 +29,7 @@ class ModuleLoader:
             cmd_modules.append(PingModule())
             cmd_modules.append(HallsModule())
             cmd_modules.append(PeopleModule())
-            cmd_modules.append(HundoModule())
+            cmd_modules.append(PokemonModule())
             cmd_modules.append(EatModule())
             cmd_modules.append(CryptoModule())
             cmd_modules.append(FetchModule())
@@ -45,6 +45,3 @@ class ModuleLoader:
     def load_all_modules(self):
         return (ModuleLoader.instance.load_cmd_modules(),
                 ModuleLoader.instance.load_auto_modules())
-
-
-
