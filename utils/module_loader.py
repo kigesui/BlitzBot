@@ -2,7 +2,8 @@
 
 # modules import
 from modules.automodules.react import AutoReactModule
-from modules.ping.ping import PingModule
+from modules.admin import PingModule
+from modules.admin import AdminModule
 from modules.halls.halls import HallsModule
 from modules.people.people import PeopleModule
 from modules.pokemon import PokemonModule
@@ -26,6 +27,7 @@ class ModuleLoader:
         def load_cmd_modules(self):
             """ Command modules execute command after bot prefix """
             cmd_modules = []
+            cmd_modules.append(AdminModule())
             cmd_modules.append(PingModule())
             cmd_modules.append(HallsModule())
             cmd_modules.append(PeopleModule())

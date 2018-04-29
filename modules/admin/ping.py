@@ -58,12 +58,4 @@ class PingModule(IModule):
             embed = EmbedHelper.success(msg)
             return [ExecResp(code=200, args=embed)]
 
-        if command == "die":
-            if exec_args.rqt_msg.author.id not in BotConfig().get_owners():
-                return [ExecResp(code=300)]
-
-            msg = "Shutting Down..."
-            embed = EmbedHelper.success(msg)
-            return [ExecResp(code=6, args=embed)]
-
         return None
