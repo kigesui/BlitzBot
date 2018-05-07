@@ -1,9 +1,10 @@
 from . import ParserException
+from putils import Singleton
 
 from data import Pokedex
 
 
-class PokemonParser():
+class PokemonParser(Singleton):
 
     def __init__(self):
         self.__reverse_dict = {}
