@@ -21,8 +21,8 @@ class TestCpArgparse(unittest.TestCase):
 
     def testParseEmpty(self):
         argline = ""
-        pokes, _ = CpParser().parse_args(argline)
-        self.assertEqual(pokes, [])
+        pokemons, _ = CpParser().parse_args(argline)
+        self.assertEqual(pokemons, [])
 
     def testParseFailExpectException(self):
         argline = "--wtf"
@@ -38,33 +38,33 @@ class TestCpArgparse(unittest.TestCase):
 
     def testParseSimple(self):
         argline = "pidgey"
-        pokes, _ = CpParser().parse_args(argline)
-        self.assertEqual(len(pokes), 1)
-        self.assertEqual(16 in pokes, True)
+        pokemons, _ = CpParser().parse_args(argline)
+        self.assertEqual(len(pokemons), 1)
+        self.assertEqual(16 in pokemons, True)
 
     def testParseTwo(self):
         argline = "pidgey rattata"
-        pokes, _ = CpParser().parse_args(argline)
-        self.assertEqual(len(pokes), 2)
-        self.assertTrue(16 in pokes)
-        self.assertTrue(19 in pokes)
+        pokemons, _ = CpParser().parse_args(argline)
+        self.assertEqual(len(pokemons), 2)
+        self.assertTrue(16 in pokemons)
+        self.assertTrue(19 in pokemons)
 
     def testParseSame(self):
         argline = "pidgey rattata pidgey"
-        pokes, _ = CpParser().parse_args(argline)
-        self.assertEqual(len(pokes), 2)
-        self.assertTrue(16 in pokes)
-        self.assertTrue(19 in pokes)
+        pokemons, _ = CpParser().parse_args(argline)
+        self.assertEqual(len(pokemons), 2)
+        self.assertTrue(16 in pokemons)
+        self.assertTrue(19 in pokemons)
 
     def testParseWithDict(self):
         pokedict = {
             'list1': ['pidgey', 'rattata']
         }
         argline = "-l list1"
-        pokes, _ = CpParser(pokedict).parse_args(argline)
-        self.assertEqual(len(pokes), 2)
-        self.assertTrue(16 in pokes)
-        self.assertTrue(19 in pokes)
+        pokemons, _ = CpParser(pokedict).parse_args(argline)
+        self.assertEqual(len(pokemons), 2)
+        self.assertTrue(16 in pokemons)
+        self.assertTrue(19 in pokemons)
 
     def testParseWithTwoDict(self):
         pokedict = {
@@ -72,12 +72,12 @@ class TestCpArgparse(unittest.TestCase):
             'list2': ['pikachu', 'raticate']
         }
         argline = "-l \"list1 list2\""
-        pokes, _ = CpParser(pokedict).parse_args(argline)
-        self.assertEqual(len(pokes), 4)
-        self.assertTrue(16 in pokes)
-        self.assertTrue(19 in pokes)
-        self.assertTrue(25 in pokes)
-        self.assertTrue(20 in pokes)
+        pokemons, _ = CpParser(pokedict).parse_args(argline)
+        self.assertEqual(len(pokemons), 4)
+        self.assertTrue(16 in pokemons)
+        self.assertTrue(19 in pokemons)
+        self.assertTrue(25 in pokemons)
+        self.assertTrue(20 in pokemons)
 
     def testParseWithWrongDict(self):
         pokedict = {
@@ -93,26 +93,25 @@ class TestCpArgparse(unittest.TestCase):
             'list1': ['pidgey', 'rattata']
         }
         argline = '-l list1 pidgey "mr. mime" sandshrew'
-        pokes, _ = CpParser(pokedict).parse_args(argline)
-        self.assertEqual(len(pokes), 4)
-        self.assertTrue(16 in pokes)
-        self.assertTrue(19 in pokes)
-        self.assertTrue(122 in pokes)
-        self.assertTrue(27 in pokes)
+        pokemons, _ = CpParser(pokedict).parse_args(argline)
+        self.assertEqual(len(pokemons), 4)
+        self.assertTrue(16 in pokemons)
+        self.assertTrue(19 in pokemons)
+        self.assertTrue(122 in pokemons)
+        self.assertTrue(27 in pokemons)
 
-    def testParseIncorrect(self):
-        argline = "asd qwe"
-        with self.assertRaisesRegex(ParserException,
-                                    ".*?is not a pokemon.*?"):
-            CpParser().parse_args(argline)
+    #def testParseIncorrect(self):
+    #    argline = "asd qwe"
+    #    with self.assertRaisesRegex(ParserException,
+    #                                ".*?is not a pokemon.*?"):
+    #        CpParser().parse_args(argline)
 
-    # todo:
-    # def testParseFuzzyWuzzy(self):
-    #     argline = "pigey rattat"
-    #     pokes = CpParser().parse_args(argline)
-    #     self.assertEqual(len(pokes), 2)
-    #     self.assertEqual(16 in pokes, True)
-    #     self.assertEqual(19 in pokes, True)
+    def testParseFuzzyWuzzy(self):
+        argline = "pigey rattat"
+        pokemons, _ = CpParser().parse_args(argline)
+        self.assertEqual(len(pokemons), 2)
+        self.assertTrue(16 in pokemons)
+        self.assertTrue(19 in pokemons)
 
 
 class TestCpStrArgparse(unittest.TestCase):
