@@ -6,19 +6,17 @@
     "plusle", "minun",
     "spheal", "venonat", "lotad",
     "surskit", "seel", "mudkip",
-    "wurmple", "tentacool"
+    "wurmple", "tentacool", "marill"
     ],
   "partly" : [
     ],
   "cloudy" : [
     ],
   "windy" : [
-    "baltoy","pidgeotto","pidgeot",
-    "spearow", "murkrow", "gligar",
-    "abra", "natu", "zubat", "golbat",
-    "jynx", "hoppip", "skiploom", "jumpluff",
-    "ralts", "hoothoot", "noctowl", "beldum",
-    "xatu", "spoink", "skarmory"
+    "baltoy", "spearow", "murkrow", "gligar",
+    "abra", "natu", "zubat",
+    "jynx", "hoppip",
+    "ralts", "hoothoot", "noctowl", "beldum"
     ],
   "snow" : [
     ],
@@ -30,5 +28,13 @@
     "sentret", "skitty", "zigzagoon",
     "shuppet", "jigglypuff", "murkrow",
     "hoothoot", "spheal"
-    ]
+    ],
+  "earth": [
+    "wailmer", "magikarp", "remoraid", "corphish", "carvanha", "poliwag", "feebas",
+    "rhyhorn", "sandshrew", "baltoy", "phanpy", "larvitar",
+    "hoppip", "cacnea", "diglett", "seedot", "shroomish", "oddish"
+  ],
+  "fight": [
+    "makuhita", "machop", "meditite", "mankey"
+  ]
 }

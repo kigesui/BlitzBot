@@ -1,4 +1,4 @@
-from .singleton import Singleton
+from putils import Singleton
 
 import json
 import os

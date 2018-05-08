@@ -1,4 +1,4 @@
-
+# NOTE: make sure package name doesn't conflict
 class Singleton(object):
     _instance = None
 

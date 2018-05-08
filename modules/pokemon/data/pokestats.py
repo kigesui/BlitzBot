@@ -1,6 +1,7 @@
 # from utils.bot_logger import BotLogger
 from . import Pokedex
-from .singleton import Singleton
+from . import IV
+from putils import Singleton
 
 import math
 import os
@@ -25,11 +26,11 @@ class PokemonStats(Singleton):
 
     def compute_cp(self, level,
                    base_atk, base_def, base_sta,
-                   iv_atk=15, iv_def=15, iv_sta=15):
+                   iv):
             m = self.__LVL_MULTIPLIER[level]
-            atk = (base_atk + iv_atk) * m
-            defen = (base_def + iv_def) * m
-            sta = (base_sta + iv_sta) * m
+            atk = (base_atk + iv.attack) * m
+            defen = (base_def + iv.defense) * m
+            sta = (base_sta + iv.stamina) * m
             cp = max(10, math.floor(math.sqrt(atk * atk * defen * sta) / 10))
             return cp
 
@@ -39,7 +40,7 @@ class PokemonStats(Singleton):
             hp = max(10, math.floor(sta))
             return hp
 
-    def get_wild_pokemon_cps(self, number, iv_atk=15, iv_def=15, iv_sta=15):
+    def get_wild_pokemon_cps(self, number, iv=IV(0xf, 0xf, 0xf)):
         # in: pokemon number
         # out: dict where key = level,
         #                 value = cp for that level
@@ -50,8 +51,7 @@ class PokemonStats(Singleton):
         base_atk, base_def, base_sta = stats
         out = {}
         for lvl in range(1, self.__WILD_CP_LIMIT+1):
-            out[lvl] = self.compute_cp(lvl, base_atk, base_def, base_sta,
-                                       iv_atk, iv_def, iv_sta)
+            out[lvl] = self.compute_cp(lvl, base_atk, base_def, base_sta, iv)
         return out
 
     def get_wild_pokemon_hps(self, number, iv_sta=15):
