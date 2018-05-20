@@ -16,8 +16,7 @@ class Pokedex(Singleton):
         return self._load_dex_from_gm()
 
     def get_all_names(self):
-        return {"pidgey", "rattata", "pikachu",
-                "raticate", "mr. meme", "sandshrew"}
+        return nil
 
     def get_stats_from_number(self, number):
         if number in self.__dict:

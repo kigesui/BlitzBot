@@ -1,12 +1,13 @@
 {
   "sunny" : [
-    "cacnea"
+    "cacnea", "roselia"
     ],
   "rainy" : [
-    "plusle", "minun",
+    "plusle", "minun", "electrike",
     "spheal", "venonat", "lotad",
     "surskit", "seel", "mudkip",
-    "wurmple", "tentacool", "marill"
+    "wurmple", "weedle", "caterpie",
+    "tentacool", "marill"
     ],
   "partly" : [
     ],
