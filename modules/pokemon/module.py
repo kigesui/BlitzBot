@@ -47,8 +47,8 @@ class PokemonModule(IModule):
                 return [ExecResp(code=500, args=embed)]
             args = " ".join(cmd_args[1:])
             try:
-                pokemon_numbers, iv_set = self.__cp_parser.parse_args(args)
-                return self.__handle_cp(pokemon_numbers, iv_set)
+                pokemon_ids, iv_set = self.__cp_parser.parse_args(args)
+                return self.__handle_cp(pokemon_ids, iv_set)
             except ParserException as e:
                 embed = EmbedHelper.error(str(e))
                 return [ExecResp(code=500, args=embed)]
@@ -63,9 +63,9 @@ class PokemonModule(IModule):
                 return [ExecResp(code=500, args=embed)]
             args = " ".join(cmd_args[1:])
             try:
-                pokemon_numbers, iv_set, break_len = \
+                pokemon_ids, iv_set, break_len = \
                     self.__cpstr_parser.parse_args(args)
-                return self.__handle_cpstr(pokemon_numbers, iv_set, break_len)
+                return self.__handle_cpstr(pokemon_ids, iv_set, break_len)
             except ParserException as e:
                 embed = EmbedHelper.error(str(e))
                 return [ExecResp(code=500, args=embed)]
@@ -75,12 +75,12 @@ class PokemonModule(IModule):
     # """
     # command handler: cp
     # """
-    def __handle_cp(self, pokemon_numbers, iv_set):
+    def __handle_cp(self, pokemon_ids, iv_set):
         ret_list = []
         for iv in iv_set:
-            for number in pokemon_numbers:
-                name = Pokedex().get_name_from_number(number)
-                cps = PokemonStats().get_wild_pokemon_cps(number, iv)
+            for pokemon_id in pokemon_ids:
+                name = Pokedex().get_name_from_id(pokemon_id)
+                cps = PokemonStats().get_wild_pokemon_cps(pokemon_id, iv)
                 cps = list(sorted(cps.values(), reverse=True))
 
                 embed = EmbedHelper.success()
@@ -112,14 +112,14 @@ class PokemonModule(IModule):
     # """
     # command handler: cpstr
     # """
-    def __handle_cpstr(self, pokemon_numbers, iv_set, break_len=0):
+    def __handle_cpstr(self, pokemon_ids, iv_set, break_len=0):
         responses = []
-        lines = self._compute_cp_resps(pokemon_numbers, iv_set, break_len)
+        lines = self._compute_cp_resps(pokemon_ids, iv_set, break_len)
         for l in lines:
             responses.append(ExecResp(code=210, args=l))
         return responses
 
-    def _compute_cp_resps(self, pokemon_numbers, iv_set, num_per_block=0):
+    def _compute_cp_resps(self, pokemon_ids, iv_set, num_per_block=0):
         # TODO: extract this function and test it
         # return these strings:
         # example: 5 pokemons and 3 per block
@@ -139,17 +139,17 @@ class PokemonModule(IModule):
             ret_lines.append(pokes_str+'&'+cps_str)
             ret_lines.append("==v==")
 
-        for number in pokemon_numbers:
+        for pokemon_id in pokemon_ids:
             counter = counter + 1
 
             # add pokemon name to all names
-            name = Pokedex().get_name_from_number(number)
+            name = Pokedex().get_name_from_id(pokemon_id)
             all_pokemon_names.append(name)
 
             # add to temporary array
             block_pokes.append(name)
             for iv in iv_set:
-                cps = PokemonStats().get_wild_pokemon_cps(number, iv)
+                cps = PokemonStats().get_wild_pokemon_cps(pokemon_id, iv)
                 for cp in list(cps.values()):
                     block_cps.add(cp)
 
