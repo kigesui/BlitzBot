@@ -12,6 +12,7 @@
   "partly" : [
     ],
   "cloudy" : [
+    "machop", "gulpin"
     ],
   "windy" : [
     "baltoy", "spearow", "murkrow", "gligar",
@@ -20,6 +21,7 @@
     "ralts", "hoothoot", "noctowl", "beldum"
     ],
   "snow" : [
+    "aron"
     ],
   "fog" : [
     ],
@@ -42,5 +44,12 @@
     "omanyte", "kabuto",
     "lileep", "anorith",
     "aron", "nosepass", "geodude"
+  ],
+  "water": [
+    "Wailmer", "Spheal", "Magikarp", "Seel", "Totodile", "Carvanha",
+    "Barboach", "Chinchou", "Slowpoke", "Shellder", "Omanyte",
+    "Luvdisc", "Corphish", "Psyduck", "Goldeen", "Octillery",
+    "krabby", "Mantine", "Tentacool", "Poliwag", "Horsea",
+    "Squirtle", "Marill", "staryu", "remoraid", "wooper", "surskit"
   ]
 }

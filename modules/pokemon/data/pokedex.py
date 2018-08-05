@@ -7,7 +7,7 @@ import re
 
 class Pokedex(Singleton):
 
-    GM_FILE = "gm-0.105.0.json"
+    GM_FILE = "gm-0.108.3.json"
 
     def __init__(self):
         self.__dict = self._load_dex_from_gm()

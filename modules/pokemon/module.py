@@ -133,11 +133,12 @@ class PokemonModule(IModule):
         counter = 0
 
         def add_pokecps_to_response(pokes, cps):
+            if len(ret_lines) != 0:
+                ret_lines.append("==v==")
             pokes_str = ','.join(pokes)
             sorted_cps = sorted(cps, reverse=True)
             cps_str = ','.join(["cp"+str(cp) for cp in sorted_cps])
             ret_lines.append(pokes_str+'&'+cps_str)
-            ret_lines.append("==v==")
 
         for pokemon_id in pokemon_ids:
             counter = counter + 1
@@ -165,8 +166,11 @@ class PokemonModule(IModule):
 
         # add last line
         if len(all_pokemon_names) > 1:
+            ret_lines.append("==v==")
             all_pokemon_names = ','.join(all_pokemon_names)
             ret_lines.append(all_pokemon_names)
-            ret_lines.append("=====")
+
+        # add ending
+        ret_lines.append("=====")
 
         return ret_lines
