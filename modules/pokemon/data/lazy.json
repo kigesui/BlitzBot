@@ -30,7 +30,7 @@
     "natu", "taillow", "whismur",
     "sentret", "skitty", "zigzagoon",
     "shuppet", "jigglypuff", "murkrow",
-    "hoothoot", "spheal"
+    "hoothoot", "spheal", "pidgey"
     ],
   "earth": [
     "wailmer", "magikarp", "remoraid", "corphish", "carvanha", "poliwag", "feebas",
@@ -51,5 +51,32 @@
     "Luvdisc", "Corphish", "Psyduck", "Goldeen", "Octillery",
     "krabby", "Mantine", "Tentacool", "Poliwag", "Horsea",
     "Squirtle", "Marill", "staryu", "remoraid", "wooper", "surskit"
+  ],
+  "johto": [
+      "snubull", "houndour", "cyndaquil", "quilava",
+      "chicorita", "bayleef", "totodile", "croconaw",
+      "slugma", "magcargo", "snubull", "sunkern",
+      "spinarak", "wooper", "misdreavus", "remoraid",
+      "octillery", "mareep", "sudowoodo", "grandbull",
+      "yanma", "shuckle", "stantler", "gligar",
+      "pineco", "teddiursa", "ursaring", "swinub",
+      "murkrow", "miltank"
+  ],
+  "psycho": [
+      "drowzee", "hypno", "meditite",
+      "natu", "xatu", "exeggcute", "exeggutor",
+      "slowpoke", "abra", "spoink", "beldum",
+      "baltoy"
+  ],
+  "mlady": [
+      "nidoranf", "nidorina", "nidoqueen",
+      "snubbull", "wobbuffet", "Pikachu",
+      "luvdisk", "clefairy"
+  ],
+  "18_halloween": [
+      "murkrow", "stunky", "shuppet", "duskull",
+      "drifloon", "pikachu", "houndour",
+      "gastly", "poochyena", "sneasel",
+      "misdreavus","sableye"
   ]
 }
