@@ -78,5 +78,11 @@
       "drifloon", "pikachu", "houndour",
       "gastly", "poochyena", "sneasel",
       "misdreavus","sableye"
+  ],
+  "letsgo": [
+    "pikachu", "eevee", "anorith", "magnemite",
+    "kabuto", "cubone", "slugma", "murkrow",
+    "grimer", "exeggcute", "omanyte",
+    "gulpin", "psyduck", "drowzee"
   ]
 }
