@@ -40,12 +40,12 @@ class PokemonStats(Singleton):
             hp = max(10, math.floor(sta))
             return hp
 
-    def get_wild_pokemon_cps(self, number, iv=IV(0xf, 0xf, 0xf)):
-        # in: pokemon number
+    def get_wild_pokemon_cps(self, pokemon_id, iv=IV(0xf, 0xf, 0xf)):
+        # in: pokemon_id
         # out: dict where key = level,
         #                 value = cp for that level
-        #      None if number is invalid
-        stats = Pokedex().get_stats_from_number(number)
+        #      None if pokemon_id is invalid
+        stats = Pokedex().get_stats_from_id(pokemon_id)
         if stats is None:
             return None
         base_atk, base_def, base_sta = stats
@@ -54,8 +54,8 @@ class PokemonStats(Singleton):
             out[lvl] = self.compute_cp(lvl, base_atk, base_def, base_sta, iv)
         return out
 
-    def get_wild_pokemon_hps(self, number, iv_sta=15):
-        stats = Pokedex().get_stats_from_number(number)
+    def get_wild_pokemon_hps(self, pokemon_id, iv_sta=15):
+        stats = Pokedex().get_stats_from_id(pokemon_id)
         if stats is None:
             return None
         _, _, base_sta = stats

@@ -1,2 +1,4 @@
+discord.py
 pycrypto==2.6.1
 argparse
+fuzzywuzzy

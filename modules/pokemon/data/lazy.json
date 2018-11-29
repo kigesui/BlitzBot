@@ -1,16 +1,18 @@
 {
   "sunny" : [
-    "cacnea"
+    "cacnea", "roselia", "vulpix"
     ],
   "rainy" : [
-    "plusle", "minun",
+    "plusle", "minun", "electrike",
     "spheal", "venonat", "lotad",
     "surskit", "seel", "mudkip",
-    "wurmple", "tentacool", "marill"
+    "wurmple", "weedle", "caterpie",
+    "tentacool", "marill"
     ],
   "partly" : [
     ],
   "cloudy" : [
+    "machop", "gulpin"
     ],
   "windy" : [
     "baltoy", "spearow", "murkrow", "gligar",
@@ -19,6 +21,7 @@
     "ralts", "hoothoot", "noctowl", "beldum"
     ],
   "snow" : [
+    "aron"
     ],
   "fog" : [
     ],
@@ -27,7 +30,7 @@
     "natu", "taillow", "whismur",
     "sentret", "skitty", "zigzagoon",
     "shuppet", "jigglypuff", "murkrow",
-    "hoothoot", "spheal"
+    "hoothoot", "spheal", "pidgey"
     ],
   "earth": [
     "wailmer", "magikarp", "remoraid", "corphish", "carvanha", "poliwag", "feebas",
@@ -36,5 +39,50 @@
   ],
   "fight": [
     "makuhita", "machop", "meditite", "mankey"
+  ],
+  "adventure": [
+    "omanyte", "kabuto",
+    "lileep", "anorith",
+    "aron", "nosepass", "geodude"
+  ],
+  "water": [
+    "Wailmer", "Spheal", "Magikarp", "Seel", "Totodile", "Carvanha",
+    "Barboach", "Chinchou", "Slowpoke", "Shellder", "Omanyte",
+    "Luvdisc", "Corphish", "Psyduck", "Goldeen", "Octillery",
+    "krabby", "Mantine", "Tentacool", "Poliwag", "Horsea",
+    "Squirtle", "Marill", "staryu", "remoraid", "wooper", "surskit"
+  ],
+  "johto": [
+      "snubull", "houndour", "cyndaquil", "quilava",
+      "chicorita", "bayleef", "totodile", "croconaw",
+      "slugma", "magcargo", "snubull", "sunkern",
+      "spinarak", "wooper", "misdreavus", "remoraid",
+      "octillery", "mareep", "sudowoodo", "grandbull",
+      "yanma", "shuckle", "stantler", "gligar",
+      "pineco", "teddiursa", "ursaring", "swinub",
+      "murkrow", "miltank"
+  ],
+  "psycho": [
+      "drowzee", "hypno", "meditite",
+      "natu", "xatu", "exeggcute", "exeggutor",
+      "slowpoke", "abra", "spoink", "beldum",
+      "baltoy"
+  ],
+  "mlady": [
+      "nidoranf", "nidorina", "nidoqueen",
+      "snubbull", "wobbuffet", "Pikachu",
+      "luvdisk", "clefairy"
+  ],
+  "18_halloween": [
+      "murkrow", "stunky", "shuppet", "duskull",
+      "drifloon", "pikachu", "houndour",
+      "gastly", "poochyena", "sneasel",
+      "misdreavus","sableye"
+  ],
+  "letsgo": [
+    "pikachu", "eevee", "anorith", "magnemite",
+    "kabuto", "cubone", "slugma", "murkrow",
+    "grimer", "exeggcute", "omanyte",
+    "gulpin", "psyduck", "drowzee"
   ]
 }
