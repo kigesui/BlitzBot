@@ -1,6 +1,10 @@
 {
   "sunny" : [
-    "cacnea", "roselia", "vulpix"
+    "cacnea", "roselia", "vulpix", "numel",
+    "growlithe", "exeggcute", "shroomish", "chikorita",
+    "charmander", "diglett", "diglett_alolan", "seedot",
+    "paras", "sandshrew", "ponyta", "sunkern", "castform",
+    "roselia"
     ],
   "rainy" : [
     "plusle", "minun", "electrike",
@@ -12,7 +16,7 @@
   "partly" : [
     ],
   "cloudy" : [
-    "machop", "gulpin"
+    "machop", "gulpin", "koffing", "grimer"
     ],
   "windy" : [
     "baltoy", "spearow", "murkrow", "gligar",
@@ -53,7 +57,7 @@
     "Squirtle", "Marill", "staryu", "remoraid", "wooper", "surskit"
   ],
   "johto": [
-      "snubull", "houndour", "cyndaquil", "quilava",
+      "snubbull", "houndour", "cyndaquil", "quilava",
       "chicorita", "bayleef", "totodile", "croconaw",
       "slugma", "magcargo", "snubull", "sunkern",
       "spinarak", "wooper", "misdreavus", "remoraid",
@@ -84,5 +88,30 @@
     "kabuto", "cubone", "slugma", "murkrow",
     "grimer", "exeggcute", "omanyte",
     "gulpin", "psyduck", "drowzee"
+  ],
+  "snow18": [
+    "snover", "delibird", "sneasel",
+    "pikachu", "snorunt", "swinub",
+    "spheal", "jynx", "stantler"
+  ],
+  "cny19": [
+    "rattata", "miltank", "electabuzz", "buneary",
+    "dratit", "ekans", "ponyta", "mareep",
+    "torchic", "mankey", "poochyena", "spoink"
+  ],
+  "val19": [
+    "whismur", "clefairy", "slowpoke", "hoppip",
+    "snubbull", "luvdisc", "miltank"
+  ],
+  "grass19": [
+    "Cacnea","Exeggcute","Seedot","Paras",
+    "Bulbasaur","Sunkern","Bellsprout","Hoppip",
+    "Nuzleaf","Shroomish","Lotad","Exeggutor",
+    "Snover","Oddish","Lileep","Chikorita"
+  ],
+  "bug19": [
+    "scyther", "yanma", "ledyba", "surskit",
+    "caterpie", "weedle", "wurmple", "venonat",
+    "spinarak", "kriketot", "anorith"
   ]
 }
